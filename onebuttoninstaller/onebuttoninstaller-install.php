@@ -31,11 +31,14 @@
 */
 /* 
 Version Date        Description
+0.1-b1  2016.01.28  real install/update from GitHub
+0.1-a6  2016.01.28  include spinner with overlay
+0.1-a5  2016.01.27  output buffering working now
 0.1-a4  2016.01.25  initial release
 0.1-a1  2016.01.16  initial release
                     
 */
-$v = "0.1-a4";      // extension version
+$v = "0.1-b1";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
@@ -50,7 +53,6 @@ global $input_errors;
 global $savemsg;
 
 $install_dir = dirname(__FILE__)."/";                           // get directory where the installer script resides
-if (!is_dir("{$install_dir}/backup")) { mkdir("{$install_dir}/backup", 0775, true); }
 if (!is_dir("{$install_dir}/log")) { mkdir("{$install_dir}/log", 0775, true); }
 
 // check FreeBSD release for fetch options >= 9.3
@@ -60,11 +62,11 @@ else $verify_hostname = "";
 // create stripped version name
 $vs = str_replace(".", "", $v);
 // fetch release archive
-$return_val = 0;//mwexec("fetch {$verify_hostname} -vo {$install_dir}master.zip 'https://github.com/crestAT/nas4free-onebuttoninstaller/releases/download/{$v}/onebuttoninstaller-{$vs}.zip'", true);
+$return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}master.zip 'https://github.com/crestAT/nas4free-onebuttoninstaller/releases/download/{$v}/onebuttoninstaller-{$vs}.zip'", true);
 if ($return_val == 0) {
-    $return_val = 0;//mwexec("tar -xf {$install_dir}master.zip -C {$install_dir} --exclude='.git*' --strip-components 2", true);
+    $return_val = mwexec("tar -xf {$install_dir}master.zip -C {$install_dir} --exclude='.git*' --strip-components 2", true);
     if ($return_val == 0) {
-//        exec("rm {$install_dir}master.zip");
+        exec("rm {$install_dir}master.zip");
         exec("chmod -R 775 {$install_dir}");
         if (is_file("{$install_dir}version.txt")) { $file_version = exec("cat {$install_dir}version.txt"); }
         else { $file_version = "n/a"; }

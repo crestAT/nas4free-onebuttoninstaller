@@ -126,29 +126,10 @@ if (isset($_POST['ext_update']) && $_POST['ext_update']) {
     else { $input_errors[] = sprintf(gettext("Download of installation file %s failed, installation aborted!"), "onebuttoninstaller-install.php"); }
 }
 include("fbegin.inc");?>
-<script type="text/javascript">
-function spinner() {
-        var opts = {
-            lines: 10, // The number of lines to draw
-            length: 7, // The length of each line
-            width: 4, // The line thickness
-            radius: 10, // The radius of the inner circle
-            corners: 1, // Corner roundness (0..1)
-            rotate: 0, // The rotation offset
-            color: '#000', // #rgb or #rrggbb
-            speed: 1, // Rounds per second
-            trail: 60, // Afterglow percentage
-            shadow: false, // Whether to render a shadow
-            hwaccel: false, // Whether to use hardware acceleration
-            className: 'spinner', // The CSS class to assign to the spinner
-            zIndex: 2e9, // The z-index (defaults to 2000000000)
-        };
-        var target = document.getElementById('foo');
-        var spinner = new Spinner(opts).spin(target);
-}
-</script>
-<div id="foo">
+<!-- The Spinner Elements -->
+<?php include("ext/onebuttoninstaller/spinner.inc");?>
 <script src="ext/onebuttoninstaller/spin.min.js"></script>
+<!-- use: onsubmit="spinner()" within the form tag -->
 
 <form action="onebuttoninstaller-update_extension.php" method="post" name="iform" id="iform" onsubmit="spinner()">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -196,4 +177,3 @@ function spinner() {
 </table>
 </form>
 <?php include("fend.inc");?>
-</div>  <!-- foo -->

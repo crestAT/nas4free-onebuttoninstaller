@@ -86,16 +86,9 @@ function log_display($loginfo) {
  * name:                0       extension name
  * version:             1       extension version (base for config entry - could change for newer versions)
  * xmlstring:           2       config.xml or installation directory
- * command(list)1:      3       SHELL commands
- * command(list)2:      4       PHP commands
+ * command(list)1:      3       execution of SHELL commands / scripts (e.g. download installer, untar, chmod, ...)
+ * command(list)2:      4       empty ("-") or PHP script name (file MUST exist)
  * description:         5       plain text which can include HTML tags
- */
-
-/*  DEBUGGER
-print_r($result[3]);
-echo('<br />');
-print_r($result[4]);
-echo('<br />');
  */
 
     // Create table data
@@ -106,13 +99,14 @@ echo('<br />');
 		echo "<tr valign=\"top\">\n";
 		for ($i = 0; $i < count($loginfo['columns']); $i++) {           // handle pmids (columns)
             if ($i == count($loginfo['columns']) - 1) {
-                // check if extension is already installed (config.xml entry or for command line tools based on install directory)
+                // check if extension is already installed (existing config.xml entry or, for command line tools, based on installation directory)
                 if ((isset($config[$result[2]])) || ((strpos($result[2], "/") == 0) && (is_dir("{$config['onebuttoninstaller']['storage_path']}{$result[2]}")))){ 
                     echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /> </td>\n";                    
                 }  
                 else {                                                  // data for installation
                     echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> 
                         <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
+                        <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
                         <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
                         <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
                     </td>\n"; 
@@ -125,74 +119,49 @@ echo('<br />');
 	}
 }
 
-//ob_start();
-//$ausgabe = ob_get_contents();
-//ob_end_clean();
-//foreach ($ausgabe as $msg) $savemsg .= $msg."<br />";
-if (isset($_POST) && $_POST) {                                          
-    foreach($_POST[name] as $line) {
+if (isset($_POST['install'], $_POST['name'])) {
+    foreach($_POST['name'] as $line) {
         if (isset($line['extension'])) {
-            $savemsg .= "<b>{$line['extension']}</b>"."<br />";
-            $savemsg .= print_r($line, true)."<br />";
+            $savemsg .= gettext("Installation").": <b>{$line['truename']}</b>"."<br />";
             unset($result);
             exec("cd {$config["onebuttoninstaller"]["storage_path"]} && {$line['command1']}", $result, $return_val);
             if ($return_val == 0) {
-                $savemsg .= "<b>command1 successful</b>"."<br />";
-            	foreach ($result as $msg) $savemsg .= $msg."<br />";
+            	foreach ($result as $msg) $savemsg .= $msg."<br />";    // output on success
                 unset($result);
-//                exec("cd {$config["onebuttoninstaller"]["storage_path"]} && {$line['command2']}", $result, $return_val);
-//                if (file_exists("{$config["onebuttoninstaller"]["storage_path"]}/{$line['command2']}")) {
-                if ("{$line['command2']}" != "-") {
-ob_start();
-                    require_once("{$config['onebuttoninstaller']['storage_path']}/{$line['command2']}");
-ob_end_clean();
-                    if ($return_val == 0) {
-                        $savemsg .= "<br />"."<b>command2 successful</b>"."<br />";
-//                    	foreach ($result as $msg) $savemsg .= $msg."<br />";
+                if ("{$line['command2']}" != "-") {                     // check if a PHP script must be executed
+                    if (file_exists("{$config["onebuttoninstaller"]["storage_path"]}/{$line['command2']}")) {
+                        $savemsg_old = $savemsg;                        // save messages for use after output buffering ends
+                        ob_start();                                     // start output buffering
+                        include("{$config['onebuttoninstaller']['storage_path']}/{$line['command2']}");
+                        $ausgabe = ob_get_contents();                   // get outputs from include command
+                        ob_end_clean();                                 // close output buffering 
+                        $savemsg = $savemsg_old;                        // recover saved messages ...
+                        $savemsg .= str_replace("\n", "<br />", $ausgabe)."<br />";     // ... and append messages from include command
                     }
-                    else {
-                    	$errormsg .= gettext("Error")."<br />";
-//                    	foreach ($result as $msg) $errormsg .= $msg."<br />";
-                        $savemsg .= "<b>command2 NOT successful</b>"."<br />";
-                    }
+                    else $errormsg .= sprintf(gettext("PHP script %s not found!"), "{$config["onebuttoninstaller"]["storage_path"]}/{$line['command2']}")."<br />";
                 }
-//                else $errormsg .= "Error: file {$config["onebuttoninstaller"]["storage_path"]}/{$line['command2']} not found!"."<br />";
-            }
-            else {
-               	$errormsg .= gettext("Error on command1")."<br />";
+            }   // EOcommand1 OK
+            else {                                                     // throw error message for command1
+                $errormsg .= gettext("Installation error").": <b>{$line['truename']}</b>"."<br />";
             	foreach ($result as $msg) $errormsg .= $msg."<br />";
-                $savemsg .= "<b>command1 NOT successful</b>"."<br />";
-            }  
-        }
-    }
-}
+            }   // EOcommand1 NOK  
+        }   // EOisset line
+    }   // EOforeach
+}   // EOinstall
 
-if (!is_file("{$config['onebuttoninstaller']['rootfolder']}extensions.txt")) $savemsg .= sprintf(gettext("File %s not found!"), "{$config['onebuttoninstaller']['rootfolder']}extensions.txt");
+if (isset($_POST['update'])) {
+    $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}extensions.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/extensions.txt", true);
+    if ($return_val == 0) $savemsg .= gettext("New extensions list successfully downloaded!")."<br />";
+    else $errormsg .= gettext("Unable to retrieve extensions list from server!")."<br />";
+}   // EOupdate
+
+if (!is_file("{$config['onebuttoninstaller']['rootfolder']}extensions.txt")) $errormsg .= sprintf(gettext("File %s not found!"), "{$config['onebuttoninstaller']['rootfolder']}extensions.txt")."<br />";
 
 include("fbegin.inc");?>
-<script type="text/javascript">
-function spinner() {
-        var opts = {
-            lines: 10, // The number of lines to draw
-            length: 7, // The length of each line
-            width: 4, // The line thickness
-            radius: 10, // The radius of the inner circle
-            corners: 1, // Corner roundness (0..1)
-            rotate: 0, // The rotation offset
-            color: '#000', // #rgb or #rrggbb
-            speed: 1, // Rounds per second
-            trail: 60, // Afterglow percentage
-            shadow: false, // Whether to render a shadow
-            hwaccel: false, // Whether to use hardware acceleration
-            className: 'spinner', // The CSS class to assign to the spinner
-            zIndex: 2e9, // The z-index (defaults to 2000000000)
-        };
-        var target = document.getElementById('foo');
-        var spinner = new Spinner(opts).spin(target);
-}
-</script>
-<div id="foo">
+<!-- The Spinner Elements -->
+<?php include("ext/onebuttoninstaller/spinner.inc");?>
 <script src="ext/onebuttoninstaller/spin.min.js"></script>
+<!-- use: onsubmit="spinner()" within the form tag -->
 
 <form action="onebuttoninstaller.php" method="post" name="iform" id="iform" onsubmit="spinner()">
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -204,8 +173,8 @@ function spinner() {
     		</ul>
     	</td></tr>
     	<tr><td class="tabcont">
-            <?php if (!empty($errormsg)) print_error_box($errormsg);?>
             <?php if (!empty($savemsg)) print_info_box($savemsg);?>
+            <?php if (!empty($errormsg)) print_error_box($errormsg);?>
     		<table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <?php 
                     log_display($loginfo[$log]);
@@ -220,4 +189,3 @@ function spinner() {
     </table>
 </form>
 <?php include("fend.inc");?>
-</div>  <!-- foo -->
