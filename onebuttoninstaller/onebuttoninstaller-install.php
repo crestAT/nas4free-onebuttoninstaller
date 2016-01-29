@@ -53,7 +53,7 @@ global $input_errors;
 global $savemsg;
 
 $install_dir = dirname(__FILE__)."/";                           // get directory where the installer script resides
-if (!is_dir("{$install_dir}/log")) { mkdir("{$install_dir}/log", 0775, true); }
+if (!is_dir("{$install_dir}log")) { mkdir("{$install_dir}log", 0775, true); }
 
 // check FreeBSD release for fetch options >= 9.3
 $release = explode("-", exec("uname -r"));
