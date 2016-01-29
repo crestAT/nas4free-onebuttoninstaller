@@ -38,7 +38,7 @@ Version Date        Description
 0.1-a1  2016.01.16  initial release
                     
 */
-$v = "0.1-b1";      // extension version
+$v = "v0.1-b1";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");

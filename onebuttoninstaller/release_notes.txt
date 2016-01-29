@@ -1,5 +1,6 @@
 ﻿Version Date        Description
-0.1-a1  2016.01.19  initial release
+0.1-b1  2016.01.29  beta release
+0.1-a1  2016.01.19  alpha release
 
 N: ...  new feature
 C: ...  changes
