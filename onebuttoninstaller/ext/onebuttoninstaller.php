@@ -103,7 +103,7 @@ function log_display($loginfo) {
                 // check if current architecture, plattform is supported
                 // architectures:  x86, x64, rpi
                 // platforms:      embedded, full, livecd, liveusb
-                if (!empty($result[6]) && ((strpos($result[6], $arch) >= 0) || (strpos($result[6], $platform) >= 0))) {
+                if (!empty($result[6]) && (!(strpos($result[6], $arch) === false) || !(strpos($result[6], $platform) === false))) {
                     echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform')."' /> </td>\n";
                 }
                 else {
