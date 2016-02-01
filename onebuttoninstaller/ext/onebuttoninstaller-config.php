@@ -103,6 +103,7 @@ if (isset($_POST['save']) && $_POST['save']) {
         $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
         if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
         change_perms($_POST['storage_path']);
+        $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
 
         if (isset($_POST['enable_schedule']) && ($_POST['startup'] == $_POST['closedown'])) { $input_errors[] = gettext("Startup and closedown hour must be different!"); }
         else {
@@ -244,6 +245,7 @@ if (isset($_POST['save']) && $_POST['save']) {
 
 $pconfig['enable'] = isset($config['onebuttoninstaller']['enable']) ? true : false;
 $pconfig['storage_path'] = !empty($config['onebuttoninstaller']['storage_path']) ? $config['onebuttoninstaller']['storage_path'] : $g['media_path'];
+$pconfig['auto_update'] = isset($config['onebuttoninstaller']['auto_update']) ? true : false;
 
 include("fbegin.inc");?>  
 <script type="text/javascript">
@@ -252,6 +254,7 @@ function enable_change(enable_change) {
     var endis = !(document.iform.enable.checked || enable_change);
 	document.iform.storage_path.disabled = endis;
 	document.iform.storage_pathbrowsebtn.disabled = endis;
+	document.iform.auto_update.disabled = endis;
 }
 //-->
 </script>
@@ -276,6 +279,7 @@ function enable_change(enable_change) {
             <?php html_titleline_checkbox("enable", gettext("OneButtonInstaller"), $pconfig['enable'], gettext("Enable"), "enable_change(false)");?>
             <?php html_text("installation_directory", gettext("Installation directory"), sprintf(gettext("The extension is installed in %s."), $config['onebuttoninstaller']['rootfolder']));?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common root directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
+            <?php html_checkbox("auto_update", gettext("Update"), $pconfig['auto_update'], gettext("Update extensions list automatically."), "", false);?>
         </table>
         <div id="submit">
 			<input id="save" name="save" type="submit" class="formbtn" value="<?=gettext("Save & Restart");?>"/>

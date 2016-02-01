@@ -43,7 +43,7 @@ $loginfo = array(
     	"logfile" => "{$config['onebuttoninstaller']['rootfolder']}extensions.txt",
     	"filename" => "extensions.txt",
     	"type" => "plain",
-		"pattern" => "/^(.*)###(.*)###(.*)###(.*)###(.*)###(.*)$/",
+		"pattern" => "/^(.*)###(.*)###(.*)###(.*)###(.*)###(.*)###(.*)$/",
     	"columns" => array(
     		array("title" => gettext("Extensions"), "class" => "listlr", "param" => "align=\"left\"  valign=\"middle\" nowrap", "pmid" => 0),
     		array("title" => gettext("Version"), "class" => "listr", "param" => "align=\"center\" valign=\"middle\"", "pmid" => 1),
@@ -89,6 +89,7 @@ function log_display($loginfo) {
  * command(list)1:      3       execution of SHELL commands / scripts (e.g. download installer, untar, chmod, ...)
  * command(list)2:      4       empty ("-") or PHP script name (file MUST exist)
  * description:         5       plain text which can include HTML tags
+ * unsupported          6       unsupported architecture, plattform
  */
 
     // Create table data
@@ -99,21 +100,29 @@ function log_display($loginfo) {
 		echo "<tr valign=\"top\">\n";
 		for ($i = 0; $i < count($loginfo['columns']); $i++) {           // handle pmids (columns)
             if ($i == count($loginfo['columns']) - 1) {
-                // check if extension is already installed (existing config.xml entry or, for command line tools, based on installation directory)
-                if ((isset($config[$result[2]])) || ((strpos($result[2], "/") == 0) && (is_dir("{$config['onebuttoninstaller']['storage_path']}{$result[2]}")))){ 
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /> </td>\n";                    
-                }  
-                else {                                                  // data for installation
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> 
-                        <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
-                        <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
-                        <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
-                        <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
-                    </td>\n"; 
+                // check if current architecture, plattform is supported
+                // architectures:  x86, x64, rpi
+                // platforms:      embedded, full, livecd, liveusb
+                if (!empty($result[6]) && ((strpos($result[6], $arch) >= 0) || (strpos($result[6], $platform) >= 0))) {
+                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform')."' /> </td>\n";
                 }
-            }
+                else {
+                    // check if extension is already installed (existing config.xml entry or, for command line tools, based on installation directory)
+                    if ((isset($config[$result[2]])) || ((strpos($result[2], "/") == 0) && (is_dir("{$config['onebuttoninstaller']['storage_path']}{$result[2]}")))){ 
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /> </td>\n";                    
+                    }  
+                    else {                                                  // data for installation
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> 
+                            <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
+                            <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
+                            <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
+                            <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
+                        </td>\n"; 
+                    }   // EOinstallation
+                }   // EOsupported
+            }   // EOcount
             else echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'>" . $result[$loginfo['columns'][$i]['pmid']] . "</td>\n";
-        }
+        }   // EOcolumns
 		echo "</tr>\n";
 		$j++;
 	}
@@ -149,7 +158,7 @@ if (isset($_POST['install'], $_POST['name'])) {
     }   // EOforeach
 }   // EOinstall
 
-if (isset($_POST['update'])) {
+if (isset($_POST['update']) || (isset($config['onebuttoninstaller']['auto_update']) && !isset($_POST['install']))) {
     $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}extensions.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/extensions.txt", true);
     if ($return_val == 0) $savemsg .= gettext("New extensions list successfully downloaded!")."<br />";
     else $errormsg .= gettext("Unable to retrieve extensions list from server!")."<br />";
