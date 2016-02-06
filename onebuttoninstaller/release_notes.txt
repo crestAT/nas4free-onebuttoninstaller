@@ -1,4 +1,5 @@
 ﻿Version Date        Description
+0.1-b3  2016.02.06  N: add language support
 0.1-b2  2016.02.01  N: check for supported architecture, plattform
                     N: auto update of extensions list
 0.1-b1  2016.01.29  beta release

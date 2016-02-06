@@ -32,6 +32,7 @@
 require("auth.inc");
 require("guiconfig.inc");
 
+bindtextdomain("nas4free", "/usr/local/share/locale-obi");
 $pgtitle = array(gettext("Extensions"), gettext("OneButtonInstaller")." ".$config['onebuttoninstaller']['version'], gettext("Maintenance"));
 
 if (is_file("{$config['onebuttoninstaller']['rootfolder']}log/oneload")) { require_once("{$config['onebuttoninstaller']['rootfolder']}log/oneload"); }
@@ -61,6 +62,8 @@ if (isset($_POST['ext_remove']) && $_POST['ext_remove']) {
 // remove extension pages
 	mwexec ("rm -rf /usr/local/www/ext/onebuttoninstaller");
 	mwexec ("rm -rf /usr/local/www/onebuttoninstaller*");
+// unlink created links
+    if (is_link("/usr/local/share/locale-obi")) unlink("/usr/local/share/locale-obi");
 // remove application section from config.xml
 	if ( is_array($config['onebuttoninstaller'] ) ) { unset( $config['onebuttoninstaller'] ); write_config();}
 	header("Location:index.php");
@@ -75,7 +78,10 @@ if (isset($_POST['ext_update']) && $_POST['ext_update']) {
     }
     else { $input_errors[] = sprintf(gettext("Download of installation file %s failed, installation aborted!"), "onebuttoninstaller-install.php"); }
 }
-include("fbegin.inc");?>
+
+bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
+include("fbegin.inc");
+bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
 <!-- The Spinner Elements -->
 <?php include("ext/onebuttoninstaller/spinner.inc");?>
 <script src="ext/onebuttoninstaller/spin.min.js"></script>

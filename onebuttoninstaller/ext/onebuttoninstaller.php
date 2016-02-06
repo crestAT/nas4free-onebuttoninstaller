@@ -33,6 +33,7 @@ require("auth.inc");
 require("guiconfig.inc");
 if (!isset($config['onebuttoninstaller']['enable'])) header("Location:onebuttoninstaller-config.php");
 
+bindtextdomain("nas4free", "/usr/local/share/locale-obi");
 $pgtitle = array(gettext("Extensions"), gettext("OneButtonInstaller")." ".$config['onebuttoninstaller']['version']);
 
 $log = 0;
@@ -167,7 +168,9 @@ if (isset($_POST['update']) || (isset($config['onebuttoninstaller']['auto_update
 
 if (!is_file("{$config['onebuttoninstaller']['rootfolder']}extensions.txt")) $errormsg .= sprintf(gettext("File %s not found!"), "{$config['onebuttoninstaller']['rootfolder']}extensions.txt")."<br />";
 
-include("fbegin.inc");?>
+bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
+include("fbegin.inc");
+bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
 <!-- The Spinner Elements -->
 <?php include("ext/onebuttoninstaller/spinner.inc");?>
 <script src="ext/onebuttoninstaller/spin.min.js"></script>

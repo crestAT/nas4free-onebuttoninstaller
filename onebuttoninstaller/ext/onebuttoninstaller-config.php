@@ -37,6 +37,7 @@ $dummy = gettext("The changes have been applied successfully.");
 $dummy = gettext("The configuration has been changed.<br />You must apply the changes in order for them to take effect.");
 $dummy = gettext("The following input errors were detected");
 
+bindtextdomain("nas4free", "/usr/local/share/locale-obi");
 $pgtitle = array(gettext("Extensions"), gettext("OneButtonInstaller")." ".$config['onebuttoninstaller']['version'], gettext("Configuration"));
 
 if (!isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstaller'])) $config['onebuttoninstaller'] = array();
@@ -92,7 +93,9 @@ $pconfig['enable'] = isset($config['onebuttoninstaller']['enable']) ? true : fal
 $pconfig['storage_path'] = !empty($config['onebuttoninstaller']['storage_path']) ? $config['onebuttoninstaller']['storage_path'] : $g['media_path'];
 $pconfig['auto_update'] = isset($config['onebuttoninstaller']['auto_update']) ? true : false;
 
-include("fbegin.inc");?>  
+bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
+include("fbegin.inc");
+bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
 <script type="text/javascript">
 <!--
 function enable_change(enable_change) {

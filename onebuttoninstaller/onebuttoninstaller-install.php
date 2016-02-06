@@ -31,6 +31,7 @@
 */
 /* 
 Version Date        Description
+0.1-b3  2016.02.06  N: add language support
 0.1-b2  2016.02.02  N: check for supported architecture, plattform
                     N: auto update of extensions list
 0.1-b1  2016.01.28  real install/update from GitHub
@@ -40,7 +41,7 @@ Version Date        Description
 0.1-a1  2016.01.16  initial release
                     
 */
-$v = "v0.1-b2";      // extension version
+$v = "v0.1-b3";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
