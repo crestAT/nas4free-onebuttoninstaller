@@ -29,6 +29,9 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
+if (is_file("/usr/local/www/bar_left.gif")) $image_path = '';
+else $image_path = 'images/';
+
 require("auth.inc");
 require("guiconfig.inc");
 if (!isset($config['onebuttoninstaller']['enable'])) header("Location:onebuttoninstaller-config.php");
@@ -65,6 +68,7 @@ function log_display($loginfo) {
     global $g;
     global $config;
     global $savemsg;
+    global $image_path;
     
 	if (!is_array($loginfo)) return;
 
@@ -106,12 +110,12 @@ function log_display($loginfo) {
                 // architectures:  x86, x64, rpi
                 // platforms:      embedded, full, livecd, liveusb
                 if (!empty($result[6]) && ((strpos($result[6], $g['arch']) !== false) || (strpos($result[6], $g['platform']) !== false))) {
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform')."' /></td>\n";
+                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform')."' /></td>\n";
                 }
                 else {
                     // check if extension is already installed (existing config.xml entry or, for command line tools, based on installation directory)
                     if ((isset($config[$result[2]])) || ((strpos($result[2], "/") == 0) && (is_dir("{$config['onebuttoninstaller']['storage_path']}{$result[2]}")))){ 
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";                    
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";                    
                     }  
                     else {                                                  // data for installation
                         echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> 
