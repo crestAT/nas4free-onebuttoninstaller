@@ -49,7 +49,7 @@ $loginfo = array(
     	"type" => "plain",
 		"pattern" => "/^(.*)###(.*)###(.*)###(.*)###(.*)###(.*)###(.*)$/",
     	"columns" => array(
-    		array("title" => gettext("Extensions"), "class" => "listlr", "param" => "align=\"left\"  valign=\"middle\" nowrap", "pmid" => 0),
+    		array("title" => gettext("Extension"), "class" => "listlr", "param" => "align=\"left\" valign=\"middle\" nowrap", "pmid" => 0),
     		array("title" => gettext("Version"), "class" => "listr", "param" => "align=\"center\" valign=\"middle\"", "pmid" => 1),
     		array("title" => gettext("Description"), "class" => "listr", "param" => "align=\"left\" valign=\"middle\"", "pmid" => 5),
     		array("title" => gettext("Install"), "class" => "listr", "param" => "align=\"center\" valign=\"middle\"", "pmid" => 4)
@@ -62,6 +62,17 @@ function log_get_contents($logfile) {
     else return;
     $content = $extensions;    
 	return $content;
+}
+
+function log_get_status($cmd_entry) {
+    global $config;
+    $i =0;
+    if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
+        for ($i; $i < count($config['rc']['postinit']['cmd']);) { if (preg_match("/$cmd_entry/", $config['rc']['postinit']['cmd'][$i])) break; ++$i; }
+    }
+//echo($cmd_entry." $i   - ");
+    if ($i == count($config['rc']['postinit']['cmd'])) return 0;        // 0 = no entry, extension is not installed
+    else return 1;                                                      // 1 = entry found, extension is already installed                                                      
 }
 
 function log_display($loginfo) {
@@ -110,15 +121,15 @@ function log_display($loginfo) {
                 // architectures:  x86, x64, rpi
                 // platforms:      embedded, full, livecd, liveusb
                 if (!empty($result[6]) && ((strpos($result[6], $g['arch']) !== false) || (strpos($result[6], $g['platform']) !== false))) {
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform')."' /></td>\n";
+                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform').': '.$result[6]."' /></td>\n";
                 }
                 else {
-                    // check if extension is already installed (existing config.xml entry or, for command line tools, based on installation directory)
-                    if ((isset($config[$result[2]])) || ((strpos($result[2], "/") == 0) && (is_dir("{$config['onebuttoninstaller']['storage_path']}{$result[2]}")))){ 
+                    // check if extension is already installed (existing config.xml or postinit cmd entry)
+                    if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
                         echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";                    
                     }  
                     else {                                                  // data for installation
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> 
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' > 
                             <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
                             <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
                             <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
@@ -197,7 +208,10 @@ bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
                     log_display($loginfo[$log]);
                 ?>
     		</table>
-            <div id="submit">
+            <div id="remarks">
+                <?php html_remark("note", gettext("Note"), gettext("After successful installation extensions can be found under the 'Extensions' entry in the navigation bar.")."<br /><b>".gettext("Some extensions need to finish their installation procedures on their own extension page before they will be shown as installed!")."</b>");?>
+            </div>
+            <div id="submit">                                                                               
                 <input name="install" type="submit" class="formbtn" title="<?=gettext("Install extensions");?>" value="<?=gettext("Install");?>" onclick="return confirm('<?=gettext("Ready to install the selected extensions?");?>')" />
                 <input name="update" type="submit" class="formbtn" title="<?=gettext("Update extensions list");?>" value="<?=gettext("Update");?>" />
             </div>

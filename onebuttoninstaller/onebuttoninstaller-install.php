@@ -31,6 +31,7 @@
 */
 /* 
 Version Date        Description
+0.1-b6  2016.06.16  recognition of extensions without GUI / config.xml entries
 0.1-b4  2016.04.07  2451 compatibility
 0.1-b3  2016.02.06  N: add language support
 0.1-b2  2016.02.02  N: check for supported architecture, plattform
@@ -42,7 +43,7 @@ Version Date        Description
 0.1-a1  2016.01.16  initial release
                     
 */
-$v = "v0.1-b4";      // extension version
+$v = "v0.1-b6";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
