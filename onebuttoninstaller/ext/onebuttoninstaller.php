@@ -49,7 +49,7 @@ $loginfo = array(
     	"type" => "plain",
 		"pattern" => "/^(.*)###(.*)###(.*)###(.*)###(.*)###(.*)###(.*)$/",
     	"columns" => array(
-    		array("title" => gettext("Extension"), "class" => "listlr", "param" => "align=\"left\" valign=\"middle\" nowrap", "pmid" => 0),
+    		array("title" => gettext("Extension"), "class" => "listlr", "param" => "align=\"left\" valign=\"middle\" style=\"font-weight:bold\" nowrap", "pmid" => 0),
     		array("title" => gettext("Version"), "class" => "listr", "param" => "align=\"center\" valign=\"middle\"", "pmid" => 1),
     		array("title" => gettext("Description"), "class" => "listr", "param" => "align=\"left\" valign=\"middle\"", "pmid" => 5),
     		array("title" => gettext("Install"), "class" => "listr", "param" => "align=\"center\" valign=\"middle\"", "pmid" => 4)
