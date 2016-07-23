@@ -29,29 +29,15 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
-/* 
-Version Date        Description
-0.1-b6  2016.06.16  recognition of extensions without GUI / config.xml entries
-0.1-b4  2016.04.07  2451 compatibility
-0.1-b3  2016.02.06  N: add language support
-0.1-b2  2016.02.02  N: check for supported architecture, plattform
-                    N: auto update of extensions list
-0.1-b1  2016.01.28  real install/update from GitHub
-0.1-a6  2016.01.28  include spinner with overlay
-0.1-a5  2016.01.27  output buffering working now
-0.1-a4  2016.01.25  initial release
-0.1-a1  2016.01.16  initial release
-                    
-*/
-$v = "v0.1-b6";      // extension version
+$v = "v0.1-b7";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
 
 $arch = $g['arch'];
 $platform = $g['platform'];
-if (($arch != "i386" && $arch != "amd64") && ($arch != "x86" && $arch != "x64" && $arch != "rpi")) { echo "\f{$arch} is an unsupported architecture!\n"; exit(1);  }
-if ($platform != "embedded" && $platform != "full" && $platform != "livecd" && $platform != "liveusb") { echo "\funsupported platform!\n";  exit(1); }
+//if (($arch != "i386" && $arch != "amd64") && ($arch != "x86" && $arch != "x64" && $arch != "rpi" && $arch != "rpi2")) { echo "\f{$arch} is an unsupported architecture!\n"; exit(1);  }
+//if ($platform != "embedded" && $platform != "full" && $platform != "livecd" && $platform != "liveusb") { echo "\funsupported platform!\n";  exit(1); }
 
 // install extension
 global $input_errors;
@@ -108,8 +94,8 @@ if ( !isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstal
     $config['rc']['shutdown']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_stop.php";
     write_config();
     require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
-    echo "\n".$appname." Version ".$config['onebuttoninstaller']['version']." installed";
-    echo "\n\nInstallation completed, use WebGUI | Extensions | ".$appname." to configure \nthe application (don't forget to refresh the WebGUI before use)!\n";
+//    echo "\n".$appname." Version ".$config['onebuttoninstaller']['version']." installed";
+//    echo "\n\nInstallation completed, use WebGUI | Extensions | ".$appname." to configure \nthe application (don't forget to refresh the WebGUI before use)!\n";
 }
 else {
 // update release

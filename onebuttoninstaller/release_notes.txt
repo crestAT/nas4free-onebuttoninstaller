@@ -1,6 +1,7 @@
 ﻿Version Date        Description
-0.1-b6  2016.06.16  recognition of extensions without GUI / config.xml entries
-0.1-b4  2016.04.07  2451 compatibility
+0.1-b7  2016.07.23  N: OBI extension installer
+0.1-b6  2016.06.16  N: recognition of extensions without GUI / config.xml entries
+0.1-b4  2016.04.07  C: 2451 compatibility
 0.1-b3  2016.02.06  N: add language support
 0.1-b2  2016.02.01  N: check for supported architecture, plattform
                     N: auto update of extensions list

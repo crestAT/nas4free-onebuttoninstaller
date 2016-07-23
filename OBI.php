@@ -1,6 +1,6 @@
 <?php
 /* 
-    onebuttoninstaller-config.php
+    OBI.php
 
     Copyright (c) 2015 - 2016 Andreas Schmidhuber
     All rights reserved.
@@ -32,13 +32,8 @@
 require("auth.inc");
 require("guiconfig.inc");
 
-// Dummy standard message gettext calls for xgettext retrieval!!!
-$dummy = gettext("The changes have been applied successfully.");
-$dummy = gettext("The configuration has been changed.<br />You must apply the changes in order for them to take effect.");
-$dummy = gettext("The following input errors were detected");
-
-bindtextdomain("nas4free", "/usr/local/share/locale-obi");
-$pgtitle = array(gettext("Extensions"), gettext("OneButtonInstaller")." ".$config['onebuttoninstaller']['version'], gettext("Configuration"));
+$application = "OneButtonInstaller";
+$pgtitle = array(gettext("Extensions"), gettext($application), gettext("Configuration"));
 
 if (!isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstaller'])) $config['onebuttoninstaller'] = array();
 
@@ -70,7 +65,7 @@ function change_perms($dir) {
             }
             else
             {
-                $input_errors[] = sprintf(gettext("OneButtonInstaller needs at least read & execute permissions at the mount point for directory %s! Set the Read and Execute bits for Others (Access Restrictions | Mode) for the mount point %s (in <a href='disks_mount.php'>Disks | Mount Point | Management</a> or <a href='disks_zfs_dataset.php'>Disks | ZFS | Datasets</a>) and hit Save in order to take them effect."), $path, "/{$path_check[1]}/{$path_check[2]}");
+                $input_errors[] = sprintf(gettext("%s needs at least read & execute permissions at the mount point for directory %s! Set the Read and Execute bits for Others (Access Restrictions | Mode) for the mount point %s (in <a href='disks_mount.php'>Disks | Mount Point | Management</a> or <a href='disks_zfs_dataset.php'>Disks | ZFS | Datasets</a>) and hit Save in order to take them effect."), $application, $path, "/{$path_check[1]}/{$path_check[2]}");
             }
         }
     }
@@ -79,66 +74,51 @@ function change_perms($dir) {
 if (isset($_POST['save']) && $_POST['save']) {
     unset($input_errors);
 	if (empty($input_errors)) {
-        $config['onebuttoninstaller']['enable'] = isset($_POST['enable']) ? true : false;
         $config['onebuttoninstaller']['storage_path'] = !empty($_POST['storage_path']) ? $_POST['storage_path'] : $g['media_path'];
         $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
         if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
-        change_perms($_POST['storage_path']);
-        $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
-        $savemsg .= get_std_save_message(write_config());
-    }   // end of empty input_errors
+        change_perms($config['onebuttoninstaller']['storage_path']);
+        $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
+        if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
+        $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
+        if ($return_val == 0) {
+            chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
+            require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
+        }
+        else { 
+            $input_errors[] = sprintf(gettext("Installation file %s not found, installation aborted!"), "{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
+            exit; 
+        }
+        mwexec("rm -Rf ext/OBI; rm -f OBI.php", true);
+        header("Location:onebuttoninstaller-config.php");
+    }
 }
 
-$pconfig['enable'] = isset($config['onebuttoninstaller']['enable']) ? true : false;
+if (isset($_POST['cancel']) && $_POST['cancel']) {
+    $return_val = mwexec("rm -Rf ext/OBI; rm -f OBI.php", true);
+    if ($return_val == 0) { $savemsg .= $application." ".gettext("not installed"); }
+    else { $input_errors[] = $application." removal failed"; }
+    header("Location:index.php");
+}
+
 $pconfig['storage_path'] = !empty($config['onebuttoninstaller']['storage_path']) ? $config['onebuttoninstaller']['storage_path'] : $g['media_path'];
-$pconfig['auto_update'] = isset($config['onebuttoninstaller']['auto_update']) ? true : false;
 
-bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
-include("fbegin.inc");
-bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
-<script type="text/javascript">
-<!--
-function enable_change(enable_change) {
-    var endis = !(document.iform.enable.checked || enable_change);
-	document.iform.storage_path.disabled = endis;
-	document.iform.storage_pathbrowsebtn.disabled = endis;
-	document.iform.auto_update.disabled = endis;
-}
-//-->
-</script>
-<form action="onebuttoninstaller-config.php" method="post" name="iform" id="iform">
+include("fbegin.inc"); ?>
+<form action="OBI.php" method="post" name="iform" id="iform">
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr><td class="tabnavtbl">
-		<ul id="tabnav">
-        <?php if (isset($config['onebuttoninstaller']['enable'])) { ?>
-    			<li class="tabinact"><a href="onebuttoninstaller.php"><span><?=gettext("Install");?></span></a></li>
-    			<li class="tabact"><a href="onebuttoninstaller-config.php"><span><?=gettext("Configuration");?></span></a></li>
-    			<li class="tabinact"><a href="onebuttoninstaller-update_extension.php"><span><?=gettext("Maintenance");?></span></a></li>
-        <?php } else { ?>
-    			<li class="tabact"><a href="onebuttoninstaller-config.php"><span><?=gettext("Configuration");?></span></a></li>
-    			<li class="tabinact"><a href="onebuttoninstaller-update_extension.php"><span><?=gettext("Maintenance");?></span></a></li>
-        <?php } ?>
-		</ul>
-	</td></tr>
     <tr><td class="tabcont">
         <?php if (!empty($input_errors)) print_input_errors($input_errors);?>
         <?php if (!empty($savemsg)) print_info_box($savemsg);?>
         <table width="100%" border="0" cellpadding="6" cellspacing="0">
-            <?php html_titleline_checkbox("enable", gettext("OneButtonInstaller"), $pconfig['enable'], gettext("Enable"), "enable_change(false)");?>
-            <?php html_text("installation_directory", gettext("Installation directory"), sprintf(gettext("The extension is installed in %s."), $config['onebuttoninstaller']['rootfolder']));?>
+            <?php html_titleline($application);?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common root directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
-            <?php html_checkbox("auto_update", gettext("Update"), $pconfig['auto_update'], gettext("Update extensions list automatically."), "", false);?>
         </table>
         <div id="submit">
 			<input id="save" name="save" type="submit" class="formbtn" value="<?=gettext("Save");?>"/>
+			<input id="cancel" name="cancel" type="submit" class="formbtn" value="<?=gettext("Cancel");?>"/>
         </div>
 	</td></tr>
 	</table>
 	<?php include("formend.inc");?>
 </form>
-<script type="text/javascript">
-<!--
-enable_change(false);
-//-->
-</script>
 <?php include("fend.inc");?>
