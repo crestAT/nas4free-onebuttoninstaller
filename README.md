@@ -21,7 +21,7 @@ INSTALLATION
 1. Prior to the installation perform a backup of the NAS4Free configuration via SYSTEM | BACKUP/RESTORE | Download configuration.
 2. Open the NAS4Free WebGUI menu entry ADVANCED | COMMAND, copy the following line, paste it to the command field and push "Execute", this will copy the installer to your system:
 <pre>
-fetch https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/OBI.php && mkdir -p ext/OBI; echo '<a href="OBI.php">OneButtonInstaller</a>' > ext/OBI/menu.inc
+fetch https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/OBI.php && mkdir -p ext/OBI; echo \'<a href="OBI.php">OneButtonInstaller</a>\' > ext/OBI/menu.inc
 </pre>
 3. Refresh the NAS4Free WebGUI and open the menu entry EXTENSIONS | OneButtonInstaller, choose a directory to install the extension to and hit 'Save' to finish the installation or hit 'Cancel' to abort and remove the installer from the system.
 4. After successful completion you can access the extension from the WebGUI menu entry EXTENSIONS | OneButtonInstaller.
@@ -29,3 +29,4 @@ fetch https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/OBI.php 
 DISCLAIMER
 ----------
 This Extensions is provided AS-IS, I'm NOT responsible for any data loss or damage caused by the use of it, use it solely at your own risk.
+
