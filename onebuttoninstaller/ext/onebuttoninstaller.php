@@ -56,6 +56,22 @@ $loginfo = array(
     	))
 );
 
+// create FreeBSD $current_release for min_release check
+$product_version = explode(".", get_product_version());
+$current_release = $product_version[0].".".$product_version[1].$product_version[2].$product_version[3].get_product_revision();
+
+function check_min_release($min_release) {
+    global $current_release;
+    if (is_float(floatval($min_release))) {
+        if ($current_release < floatval($min_release)) return false;    // release not supported
+        else return true;                                               // release supported
+    }
+    else return true;                                                   // not a float, no release
+}
+//$sup="10.3032898";        // CHECK
+//if (check_min_release($sup)) $savemsg .= "{$sup} = SUPPORTED";
+//else $savemsg .= "{$sup} = NOT SUPPORTED";
+
 function log_get_contents($logfile) {
 	$content = array();
     if (is_file($logfile)) exec("cat {$logfile}", $extensions);
@@ -94,9 +110,7 @@ function log_display($loginfo) {
 	$content = log_get_contents($loginfo['logfile']);
 	if (empty($content)) return;
     sort($content);
-
     $j = 0;
-
 /*
  * EXTENSIONS.TXT format description: PARAMETER DELIMITER -> ###
  *                      PMID    COMMENT
@@ -106,9 +120,11 @@ function log_display($loginfo) {
  * command(list)1:      3       execution of SHELL commands / scripts (e.g. download installer, untar, chmod, ...)
  * command(list)2:      4       empty ("-") or PHP script name (file MUST exist)
  * description:         5       plain text which can include HTML tags
- * unsupported          6       unsupported architecture, plattform
+ * unsupported          6       unsupported architecture, plattform, release
+ *                              architectures:   x86, x64, rpi, rpi2, bananapi
+ *                              platforms:       embedded, full, livecd, liveusb
+ *                              releases:        9.3, 10.2, 10.3032853, 10.3032898, 11.0, ...
  */
-
     // Create table data
 	foreach ($content as $contentv) {                                   // handle each line => one extension
 		unset($result);
@@ -117,26 +133,32 @@ function log_display($loginfo) {
 		echo "<tr valign=\"top\">\n";
 		for ($i = 0; $i < count($loginfo['columns']); $i++) {           // handle pmids (columns)
             if ($i == count($loginfo['columns']) - 1) {
-                // check if current architecture, plattform is supported
-                // architectures:  x86, x64, rpi
-                // platforms:      embedded, full, livecd, liveusb
-                if (!empty($result[6]) && ((strpos($result[6], $g['arch']) !== false) || (strpos($result[6], $g['platform']) !== false))) {
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform').': '.$result[6]."' /></td>\n";
+                // check if extension is already installed (existing config.xml or postinit cmd entry)
+                if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
+                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";
                 }
-                else {
-                    // check if extension is already installed (existing config.xml or postinit cmd entry)
-                    if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";                    
-                    }  
-                    else {                                                  // data for installation
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' > 
+                else {                                                  // not installed
+                    $supported_app = true;
+                    if (!empty($result[6])) {                           // something unsupported exist
+                        $unsupported = explode(",", str_replace(" ", "", $result[6]));
+                        for ($k = 0; $k < count($unsupported); $k++) {  // check for unsupported release / architecture / platforms
+                            if (!check_min_release($unsupported[$k]) || ($unsupported[$k] == $g['arch']) || ($unsupported[$k] == $g['platform'])) {
+                                echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform/release').': '.$unsupported[$k]."' /></td>\n";
+                                $supported_app = false;
+                                break;
+                            }
+                        }
+                    } 
+                    if ($supported_app === true) {
+                    // data for installation
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' >
                             <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
                             <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
                             <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
                             <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
-                        </td>\n"; 
-                    }   // EOinstallation
-                }   // EOsupported
+                        </td>\n";
+                    }                
+                }   // EOnot-installed
             }   // EOcount
             else echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'>" . $result[$loginfo['columns'][$i]['pmid']] . "</td>\n";
         }   // EOcolumns
@@ -209,7 +231,10 @@ bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
                 ?>
     		</table>
             <div id="remarks">
-                <?php html_remark("note", gettext("Note"), gettext("After successful installation extensions can be found under the 'Extensions' entry in the navigation bar.")."<br /><b>".gettext("Some extensions need to finish their installation procedures on their own extension page before they will be shown as installed!")."</b>");?>
+                <?php html_remark("note", gettext("Note"), gettext("After successful installation extensions can be found under the 'Extensions' entry in the navigation bar.")."<br /><b>".gettext("Some extensions need to finish their installation procedures on their own extension page before they will be shown as installed!")."</b><br /><br />");?>
+                <?php html_remark("legend", sprintf(gettext("Icons in the %s column"), gettext("Install")), "");?>
+                <img src='images/status_disabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension can not be installed because of an unsupported architecture/platform/release of the system. Hover with the mouse over the icon to see what is unsupported.");?><br />
+                <img src='images/status_enabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension is already installed."); ?><br /><br />
             </div>
             <div id="submit">                                                                               
                 <input name="install" type="submit" class="formbtn" title="<?=gettext("Install extensions");?>" value="<?=gettext("Install");?>" onclick="return confirm('<?=gettext("Ready to install the selected extensions?");?>')" />

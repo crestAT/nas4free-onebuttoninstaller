@@ -4,6 +4,8 @@
     Copyright (c) 2015 - 2016 Andreas Schmidhuber
     All rights reserved.
 
+    Uses spin.js by Felix Gnass (fgnass) at http://spin.js.org
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
