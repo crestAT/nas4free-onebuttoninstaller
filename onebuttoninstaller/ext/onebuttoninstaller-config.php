@@ -82,10 +82,15 @@ if (isset($_POST['save']) && $_POST['save']) {
         $config['onebuttoninstaller']['enable'] = isset($_POST['enable']) ? true : false;
         $config['onebuttoninstaller']['storage_path'] = !empty($_POST['storage_path']) ? $_POST['storage_path'] : $g['media_path'];
         $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
-        if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
-        change_perms($_POST['storage_path']);
-        $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
-        $savemsg .= get_std_save_message(write_config());
+        if (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false) {
+            $input_errors[] = gettext("The common directory for all extensions MUST be set to a directory below <b>'/mnt/'</b> to prevent to loose the extensions after a reboot on embedded systems!");
+        }
+        else {
+            if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
+            change_perms($_POST['storage_path']);
+            $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
+            $savemsg .= get_std_save_message(write_config());
+        }
     }   // end of empty input_errors
 }
 
@@ -126,7 +131,7 @@ function enable_change(enable_change) {
         <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <?php html_titleline_checkbox("enable", gettext("OneButtonInstaller"), $pconfig['enable'], gettext("Enable"), "enable_change(false)");?>
             <?php html_text("installation_directory", gettext("Installation directory"), sprintf(gettext("The extension is installed in %s."), $config['onebuttoninstaller']['rootfolder']));?>
-			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common root directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
+			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
             <?php html_checkbox("auto_update", gettext("Update"), $pconfig['auto_update'], gettext("Update extensions list automatically."), "", false);?>
         </table>
         <div id="submit">

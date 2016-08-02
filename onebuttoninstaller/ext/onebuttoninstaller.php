@@ -232,9 +232,9 @@ bindtextdomain("nas4free", "/usr/local/share/locale-obi"); ?>
     		</table>
             <div id="remarks">
                 <?php html_remark("note", gettext("Note"), gettext("After successful installation extensions can be found under the 'Extensions' entry in the navigation bar.")."<br /><b>".gettext("Some extensions need to finish their installation procedures on their own extension page before they will be shown as installed!")."</b><br /><br />");?>
-                <?php html_remark("legend", sprintf(gettext("Icons in the %s column"), gettext("Install")), "");?>
-                <img src='images/status_disabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension can not be installed because of an unsupported architecture/platform/release of the system. Hover with the mouse over the icon to see what is unsupported.");?><br />
-                <img src='images/status_enabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension is already installed."); ?><br /><br />
+                <?php html_remark("legend", sprintf(gettext("Icons in the %s column"), "'".gettext("Install")."'"), "");?>
+                <img src='<?=$image_path?>status_disabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension can not be installed because of an unsupported architecture/platform/release of the system. Hover with the mouse over the icon to see what is unsupported.");?><br />
+                <img src='<?=$image_path?>status_enabled.png' border='0' alt='' title='' />&nbsp;&nbsp;&nbsp;<?php echo "... ".gettext("The extension is already installed."); ?><br /><br />
             </div>
             <div id="submit">                                                                               
                 <input name="install" type="submit" class="formbtn" title="<?=gettext("Install extensions");?>" value="<?=gettext("Install");?>" onclick="return confirm('<?=gettext("Ready to install the selected extensions?");?>')" />

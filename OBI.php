@@ -76,21 +76,26 @@ if (isset($_POST['save']) && $_POST['save']) {
 	if (empty($input_errors)) {
         $config['onebuttoninstaller']['storage_path'] = !empty($_POST['storage_path']) ? $_POST['storage_path'] : $g['media_path'];
         $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
-        if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
-        change_perms($config['onebuttoninstaller']['storage_path']);
-        $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
-        if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
-        $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
-        if ($return_val == 0) {
-            chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
-            require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
+        if (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false) {
+            $input_errors[] = gettext("The common directory for all extensions MUST be set to a directory below <b>'/mnt/'</b> to prevent to loose the extensions after a reboot on embedded systems!");
         }
-        else { 
-            $input_errors[] = sprintf(gettext("Installation file %s not found, installation aborted!"), "{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
-            exit; 
+        else {
+            if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
+            change_perms($config['onebuttoninstaller']['storage_path']);
+            $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
+            if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
+            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
+            if ($return_val == 0) {
+                chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
+                require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
+            }
+            else {
+                $input_errors[] = sprintf(gettext("Installation file %s not found, installation aborted!"), "{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
+                exit;
+            }
+            mwexec("rm -Rf ext/OBI; rm -f OBI.php", true);
+            header("Location:onebuttoninstaller-config.php");
         }
-        mwexec("rm -Rf ext/OBI; rm -f OBI.php", true);
-        header("Location:onebuttoninstaller-config.php");
     }
 }
 
@@ -111,7 +116,7 @@ include("fbegin.inc"); ?>
         <?php if (!empty($savemsg)) print_info_box($savemsg);?>
         <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <?php html_titleline($application);?>
-			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common root directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
+			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
         </table>
         <div id="submit">
 			<input id="save" name="save" type="submit" class="formbtn" value="<?=gettext("Save");?>"/>
