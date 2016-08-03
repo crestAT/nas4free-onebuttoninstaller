@@ -36,6 +36,7 @@ require_once("config.inc");
 
 $arch = $g['arch'];
 $platform = $g['platform'];
+// no check necessary since the extension is for all archictectures/platforms/releases
 //if (($arch != "i386" && $arch != "amd64") && ($arch != "x86" && $arch != "x64" && $arch != "rpi" && $arch != "rpi2")) { echo "\f{$arch} is an unsupported architecture!\n"; exit(1);  }
 //if ($platform != "embedded" && $platform != "full" && $platform != "livecd" && $platform != "liveusb") { echo "\funsupported platform!\n";  exit(1); }
 
@@ -94,8 +95,6 @@ if ( !isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstal
     $config['rc']['shutdown']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_stop.php";
     write_config();
     require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
-//    echo "\n".$appname." Version ".$config['onebuttoninstaller']['version']." installed";
-//    echo "\n\nInstallation completed, use WebGUI | Extensions | ".$appname." to configure \nthe application (don't forget to refresh the WebGUI before use)!\n";
 }
 else {
 // update release
@@ -116,4 +115,6 @@ else {
     write_config();
     require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
 }
+// finally fetch the most recent extensions list to get the latest changes if not already in the master release
+$return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}extensions.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/extensions.txt", true);
 ?>
