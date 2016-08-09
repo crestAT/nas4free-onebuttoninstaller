@@ -31,8 +31,8 @@
 */
 $extension_dir = "/usr/local/www"; 
 
-if ( !is_link ( "/usr/local/share/locale-obi")) { mwexec("ln -s {$config['onebuttoninstaller']['rootfolder']}locale-obi /usr/local/share/", true); }     // create link to languages
+mwexec("ln -sf {$config['onebuttoninstaller']['rootfolder']}locale-obi /usr/local/share/", true);           // create link to languages
 $return_val = mwexec("cp -R {$config['onebuttoninstaller']['rootfolder']}ext/* {$extension_dir}/", true);
 if ($return_val == 0) exec("logger onebuttoninstaller: started");
-else exec("logger onebuttoninstaller: error during startup, not started"); 
+else exec("logger onebuttoninstaller: error during startup, file copy to {$extension_dir} failed"); 
 ?>

@@ -1,4 +1,7 @@
 ﻿Version Date        Description
+0.2     2016.08.09  N: configuration - enable/disable beta releases in extensions list
+                    N: check hardware platform to use midnightcommander on i386 too
+                    F: disabling extension not possible, leads to an error message
 0.1     2016.08.01  initial release
 
 N: ...  new feature

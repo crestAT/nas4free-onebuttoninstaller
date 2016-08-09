@@ -10,12 +10,14 @@
 # date:         2013-08-23 ; Fetch files from packages-9.2-release ; add libssh2
 # date:         2014-12-18 ; Update for v9.3; Clean up
 # date:         2015-02-21 ; Update mc package to mc-4.8.11.tbz
+# date:         2016-08-04 ; check hardware platform to use it on i386 too - author: crest <info@a3s.at>
 # purpose:      Install Midnight Commander on NAS4Free (embedded version).
 # Note:         Check the end of the page.
 #
 #----------------------- Set variables ------------------------------------------------------------------
 DIR=`dirname $0`;
-URL="ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/amd64/packages-9.2-release/Latest"
+HWPLATFORM=`uname -m`;
+URL="ftp://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/${HWPLATFORM}/packages-9.2-release/Latest"
 MCLIGHTFILE="mc.tbz"
 LIBSLANGFILE="libslang2.tbz"
 LIBSSH2FILE="libssh2.tbz"

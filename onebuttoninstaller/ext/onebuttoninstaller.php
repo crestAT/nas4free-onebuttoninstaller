@@ -115,7 +115,7 @@ function log_display($loginfo) {
  * EXTENSIONS.TXT format description: PARAMETER DELIMITER -> ###
  *                      PMID    COMMENT
  * name:                0       extension name
- * version:             1       extension version (base for config entry - could change for newer versions)
+ * version:             1       extension version (base for config entry - could change for newer versions), check for beta releases
  * xmlstring:           2       config.xml or installation directory
  * command(list)1:      3       execution of SHELL commands / scripts (e.g. download installer, untar, chmod, ...)
  * command(list)2:      4       empty ("-") or PHP script name (file MUST exist)
@@ -132,35 +132,40 @@ function log_display($loginfo) {
 		if ((FALSE === $result) || (0 == $result)) continue;
 		echo "<tr valign=\"top\">\n";
 		for ($i = 0; $i < count($loginfo['columns']); $i++) {           // handle pmids (columns)
-            if ($i == count($loginfo['columns']) - 1) {
-                // check if extension is already installed (existing config.xml or postinit cmd entry)
-                if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
-                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";
-                }
-                else {                                                  // not installed
-                    $supported_app = true;
-                    if (!empty($result[6])) {                           // something unsupported exist
-                        $unsupported = explode(",", str_replace(" ", "", $result[6]));
-                        for ($k = 0; $k < count($unsupported); $k++) {  // check for unsupported release / architecture / platforms
-                            if (!check_min_release($unsupported[$k]) || ($unsupported[$k] == $g['arch']) || ($unsupported[$k] == $g['platform'])) {
-                                echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform/release').': '.$unsupported[$k]."' /></td>\n";
-                                $supported_app = false;
-                                break;
+            if (!isset($config['onebuttoninstaller']['show_beta'])  && (strpos($result[1], "RELEASE") === false)) continue;     //check for beta state
+            else {
+                if ($i == count($loginfo['columns']) - 1) {
+                
+                
+                    // check if extension is already installed (existing config.xml or postinit cmd entry)
+                    if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
+                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";
+                    }
+                    else {                                                  // not installed
+                        $supported_app = true;
+                        if (!empty($result[6])) {                           // something unsupported exist
+                            $unsupported = explode(",", str_replace(" ", "", $result[6]));
+                            for ($k = 0; $k < count($unsupported); $k++) {  // check for unsupported release / architecture / platforms
+                                if (!check_min_release($unsupported[$k]) || ($unsupported[$k] == $g['arch']) || ($unsupported[$k] == $g['platform'])) {
+                                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform/release').': '.$unsupported[$k]."' /></td>\n";
+                                    $supported_app = false;
+                                    break;
+                                }
                             }
-                        }
-                    } 
-                    if ($supported_app === true) {
-                    // data for installation
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' >
-                            <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
-                            <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
-                            <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
-                            <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
-                        </td>\n";
-                    }                
-                }   // EOnot-installed
-            }   // EOcount
-            else echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'>" . $result[$loginfo['columns'][$i]['pmid']] . "</td>\n";
+                        } 
+                        if ($supported_app === true) {
+                        // data for installation
+                            echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' >
+                                <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
+                                <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
+                                <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
+                                <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
+                            </td>\n";
+                        }                
+                    }   // EOnot-installed
+                }   // EOcount
+                else echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'>" . $result[$loginfo['columns'][$i]['pmid']] . "</td>\n";
+            }   //EObeta-check
         }   // EOcolumns
 		echo "</tr>\n";
 		$j++;
