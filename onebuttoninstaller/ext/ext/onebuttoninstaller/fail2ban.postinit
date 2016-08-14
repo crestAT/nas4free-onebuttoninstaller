@@ -3,10 +3,9 @@ $command = "fail2ban_start.sh";
 $cmd = dirname(__FILE__)."/".$command;
 require_once("config.inc");
 require_once("functions.inc");
-        $i =0;
 		if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-            for ($i; $i < count($config['rc']['postinit']['cmd']);) {
-                if (preg_match("/$command/", $config['rc']['postinit']['cmd'][$i])) break; ++$i; }
+            for ($i = 0; $i < count($config['rc']['postinit']['cmd']); $i++) {
+                if (preg_match("/$command/", $config['rc']['postinit']['cmd'][$i])) break; }
         }
         $config['rc']['postinit']['cmd'][$i] = $config['cmd']."$cmd";
 		write_config();

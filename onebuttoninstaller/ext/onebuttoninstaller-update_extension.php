@@ -48,20 +48,19 @@ else { $server_version = gettext("Unable to retrieve version from server!"); }
 if (isset($_POST['ext_remove']) && $_POST['ext_remove']) {
 // remove start/stop commands
     if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['postinit']['cmd']);) {
+		for ($i = 0; $i < count($config['rc']['postinit']['cmd']); $i++) {
     		if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) { unset($config['rc']['postinit']['cmd'][$i]);} else{}
-		++$i;
 		}
 	}
 	if ( is_array($config['rc']['shutdown'] ) && is_array( $config['rc']['shutdown']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); ) {
+		for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); $i++) {
             if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) { unset($config['rc']['shutdown']['cmd'][$i]); } else {}
-		++$i;
 		}
 	}
 // remove extension pages
-	mwexec ("rm -rf /usr/local/www/ext/onebuttoninstaller");
-	mwexec ("rm -rf /usr/local/www/onebuttoninstaller*");
+	mwexec("rm -rf /usr/local/www/ext/onebuttoninstaller");
+	mwexec("rmdir -p /usr/local/www/ext");    // to prevent empty extensions menu entry in top GUI menu if there are no other extensions installed
+	mwexec("rm -rf /usr/local/www/onebuttoninstaller*");
 // unlink created links
     if (is_link("/usr/local/share/locale-obi")) unlink("/usr/local/share/locale-obi");
 // remove application section from config.xml

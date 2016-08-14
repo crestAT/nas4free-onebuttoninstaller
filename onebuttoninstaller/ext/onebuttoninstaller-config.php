@@ -83,15 +83,17 @@ if (isset($_POST['save']) && $_POST['save']) {
         if (isset($_POST['enable'])) {
             $config['onebuttoninstaller']['storage_path'] = !empty($_POST['storage_path']) ? $_POST['storage_path'] : $g['media_path'];
             $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
-            if (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false) {
+            if (!isset($_POST['path_check']) && (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false)) {
                 $input_errors[] = gettext("The common directory for all extensions MUST be set to a directory below <b>'/mnt/'</b> to prevent to loose the extensions after a reboot on embedded systems!");
             }
             else {
                 if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
                 change_perms($_POST['storage_path']);
+                $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
                 $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
                 $config['onebuttoninstaller']['show_beta'] = isset($_POST['show_beta']) ? true : false;
                 $savemsg .= get_std_save_message(write_config());
+                require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
             }
         }
         else $savemsg .= get_std_save_message(write_config());
@@ -100,8 +102,15 @@ if (isset($_POST['save']) && $_POST['save']) {
 
 $pconfig['enable'] = isset($config['onebuttoninstaller']['enable']) ? true : false;
 $pconfig['storage_path'] = !empty($config['onebuttoninstaller']['storage_path']) ? $config['onebuttoninstaller']['storage_path'] : $g['media_path'];
+$pconfig['path_check'] = isset($config['onebuttoninstaller']['path_check']) ? true : false;
 $pconfig['auto_update'] = isset($config['onebuttoninstaller']['auto_update']) ? true : false;
 $pconfig['show_beta'] = isset($config['onebuttoninstaller']['show_beta']) ? true : false;
+
+$return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}log/version.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/version.txt", false);
+if ($return_val == 0) {
+    $server_version = exec("cat {$config['onebuttoninstaller']['rootfolder']}log/version.txt");
+    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg = sprintf(gettext("New extension version %s available, use '%s' to install the new version!"), $server_version, gettext("Maintenance")); }
+}   //EOversion-check
 
 bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
 include("fbegin.inc");
@@ -112,6 +121,7 @@ function enable_change(enable_change) {
     var endis = !(document.iform.enable.checked || enable_change);
 	document.iform.storage_path.disabled = endis;
 	document.iform.storage_pathbrowsebtn.disabled = endis;
+	document.iform.path_check.disabled = endis;
 	document.iform.auto_update.disabled = endis;
 	document.iform.show_beta.disabled = endis;
 }
@@ -138,6 +148,7 @@ function enable_change(enable_change) {
             <?php html_titleline_checkbox("enable", gettext("OneButtonInstaller"), $pconfig['enable'], gettext("Enable"), "enable_change(false)");?>
             <?php html_text("installation_directory", gettext("Installation directory"), sprintf(gettext("The extension is installed in %s"), $config['onebuttoninstaller']['rootfolder']));?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
+            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), gettext("Please use this option only if you know what you are doing!"), false);?>
             <?php html_checkbox("auto_update", gettext("Update"), $pconfig['auto_update'], gettext("Update extensions list automatically."), "", false);?>
             <?php html_checkbox("show_beta", gettext("Beta releases"), $pconfig['show_beta'], gettext("If enabled, extensions in beta state will be shown in the extensions list."), "", false);?>
         </table>

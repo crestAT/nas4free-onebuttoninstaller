@@ -1,4 +1,6 @@
 ﻿Version Date        Description
+0.3     2016.08.14  N: configuration - checkbox to override restriction for extensions installation path 
+                       (limited to a directory under /mnt/)
 0.2     2016.08.09  N: configuration - enable/disable beta releases in extensions list
                     N: check hardware platform to use midnightcommander on i386 too
                     F: disabling extension not possible, leads to an error message
