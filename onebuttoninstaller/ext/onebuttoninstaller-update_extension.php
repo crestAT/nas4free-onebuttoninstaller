@@ -40,7 +40,7 @@ if (is_file("{$config['onebuttoninstaller']['rootfolder']}log/oneload")) { requi
 $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}log/version.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/version.txt", true);
 if ($return_val == 0) { 
     $server_version = exec("cat {$config['onebuttoninstaller']['rootfolder']}log/version.txt"); 
-    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg = sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Update Extension")); }
+    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg .= sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Update Extension")); }
     mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}release_notes.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/release_notes.txt", false);
 }
 else { $server_version = gettext("Unable to retrieve version from server!"); }

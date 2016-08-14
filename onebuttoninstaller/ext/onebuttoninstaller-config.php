@@ -92,11 +92,11 @@ if (isset($_POST['save']) && $_POST['save']) {
                 $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
                 $config['onebuttoninstaller']['auto_update'] = isset($_POST['auto_update']) ? true : false;
                 $config['onebuttoninstaller']['show_beta'] = isset($_POST['show_beta']) ? true : false;
-                $savemsg .= get_std_save_message(write_config());
+                $savemsg .= get_std_save_message(write_config())." ";
                 require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
             }
         }
-        else $savemsg .= get_std_save_message(write_config());
+        else $savemsg .= get_std_save_message(write_config())." ";
     }   // end of empty input_errors
 }
 
@@ -109,7 +109,7 @@ $pconfig['show_beta'] = isset($config['onebuttoninstaller']['show_beta']) ? true
 $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}log/version.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/version.txt", false);
 if ($return_val == 0) {
     $server_version = exec("cat {$config['onebuttoninstaller']['rootfolder']}log/version.txt");
-    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg = sprintf(gettext("New extension version %s available, use '%s' to install the new version!"), $server_version, gettext("Maintenance")); }
+    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg .= sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Maintenance")); }
 }   //EOversion-check
 
 bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
