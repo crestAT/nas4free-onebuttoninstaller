@@ -85,7 +85,7 @@ if (isset($_POST['save']) && $_POST['save']) {
             $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
             $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
             if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
-            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
+            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/devel_1/onebuttoninstaller/onebuttoninstaller-install.php'", true);
             if ($return_val == 0) {
                 chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
                 require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
@@ -119,7 +119,7 @@ include("fbegin.inc"); ?>
         <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <?php html_titleline($application);?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
-            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), gettext("Please use this option only if you know what you are doing!"), false);?>        </table>
+            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), "<b><font color='red'>".gettext("Please use this option only if you know what you are doing!")."</font></b>", false);?>        </table>
         <div id="submit">
 			<input id="save" name="save" type="submit" class="formbtn" value="<?=gettext("Save");?>"/>
 			<input id="cancel" name="cancel" type="submit" class="formbtn" value="<?=gettext("Cancel");?>"/>
