@@ -85,7 +85,7 @@ if (isset($_POST['save']) && $_POST['save']) {
             $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
             $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
             if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
-            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/devel_1/onebuttoninstaller/onebuttoninstaller-install.php'", true);
+            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
             if ($return_val == 0) {
                 chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
                 require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
