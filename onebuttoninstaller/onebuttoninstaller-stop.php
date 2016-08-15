@@ -32,5 +32,5 @@
 $extension_dir = "/usr/local/www";
 mwexec("rm -Rf {$extension_dir}/onebuttoninstaller*", true);
 mwexec("rm -Rf {$extension_dir}/ext/onebuttoninstaller", true);
-exec("logger onebuttoninstaller: stopped");
+exec("logger onebuttoninstaller: stopped"); 
 ?>

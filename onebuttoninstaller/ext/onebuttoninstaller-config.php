@@ -148,7 +148,7 @@ function enable_change(enable_change) {
             <?php html_titleline_checkbox("enable", gettext("OneButtonInstaller"), $pconfig['enable'], gettext("Enable"), "enable_change(false)");?>
             <?php html_text("installation_directory", gettext("Installation directory"), sprintf(gettext("The extension is installed in %s"), $config['onebuttoninstaller']['rootfolder']));?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
-            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), gettext("Please use this option only if you know what you are doing!"), false);?>
+            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), "<b><font color='red'>".gettext("Please use this option only if you know what you are doing!")."</font></b>", false);?>
             <?php html_checkbox("auto_update", gettext("Update"), $pconfig['auto_update'], gettext("Update extensions list automatically."), "", false);?>
             <?php html_checkbox("show_beta", gettext("Beta releases"), $pconfig['show_beta'], gettext("If enabled, extensions in beta state will be shown in the extensions list."), "", false);?>
         </table>

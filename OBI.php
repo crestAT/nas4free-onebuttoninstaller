@@ -76,12 +76,13 @@ if (isset($_POST['save']) && $_POST['save']) {
 	if (empty($input_errors)) {
         $config['onebuttoninstaller']['storage_path'] = !empty($_POST['storage_path']) ? $_POST['storage_path'] : $g['media_path'];
         $config['onebuttoninstaller']['storage_path'] = rtrim($config['onebuttoninstaller']['storage_path'],'/');         // ensure to have NO trailing slash
-        if (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false) {
+        if (!isset($_POST['path_check']) && (strpos($config['onebuttoninstaller']['storage_path'], "/mnt/") === false)) {
             $input_errors[] = gettext("The common directory for all extensions MUST be set to a directory below <b>'/mnt/'</b> to prevent to loose the extensions after a reboot on embedded systems!");
         }
         else {
             if (!is_dir($config['onebuttoninstaller']['storage_path'])) mkdir($config['onebuttoninstaller']['storage_path'], 0775, true);
             change_perms($config['onebuttoninstaller']['storage_path']);
+            $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
             $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
             if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
             $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
@@ -91,7 +92,7 @@ if (isset($_POST['save']) && $_POST['save']) {
             }
             else {
                 $input_errors[] = sprintf(gettext("Installation file %s not found, installation aborted!"), "{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");
-                exit;
+                return;
             }
             mwexec("rm -Rf ext/OBI; rm -f OBI.php", true);
             header("Location:onebuttoninstaller-config.php");
@@ -107,6 +108,7 @@ if (isset($_POST['cancel']) && $_POST['cancel']) {
 }
 
 $pconfig['storage_path'] = !empty($config['onebuttoninstaller']['storage_path']) ? $config['onebuttoninstaller']['storage_path'] : $g['media_path'];
+$pconfig['path_check'] = isset($config['onebuttoninstaller']['path_check']) ? true : false;
 
 include("fbegin.inc"); ?>
 <form action="OBI.php" method="post" name="iform" id="iform">
@@ -117,7 +119,7 @@ include("fbegin.inc"); ?>
         <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <?php html_titleline($application);?>
 			<?php html_filechooser("storage_path", gettext("Common directory"), $pconfig['storage_path'], gettext("Common directory for all extensions (a persistant place where all extensions are/should be - a directory below <b>/mnt/</b>)."), $pconfig['storage_path'], true, 60);?>
-        </table>
+            <?php html_checkbox("path_check", gettext("Path check"), $pconfig['path_check'], gettext("If this option is selected no examination of the common directory path will be carried out (whether it was set to a directory below /mnt/)."), "<b><font color='red'>".gettext("Please use this option only if you know what you are doing!")."</font></b>", false);?>        </table>
         <div id="submit">
 			<input id="save" name="save" type="submit" class="formbtn" value="<?=gettext("Save");?>"/>
 			<input id="cancel" name="cancel" type="submit" class="formbtn" value="<?=gettext("Cancel");?>"/>
