@@ -208,6 +208,12 @@ if (isset($_POST['update']) || (isset($config['onebuttoninstaller']['auto_update
     else $errormsg .= gettext("Unable to retrieve extensions list from server!")."<br />";
 }   // EOupdate
 
+$return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}log/version.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/version.txt", false);
+if ($return_val == 0) {
+    $server_version = exec("cat {$config['onebuttoninstaller']['rootfolder']}log/version.txt");
+    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg .= sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Maintenance")); }
+}   //EOversion-check
+
 if (!is_file("{$config['onebuttoninstaller']['rootfolder']}extensions.txt")) $errormsg .= sprintf(gettext("File %s not found!"), "{$config['onebuttoninstaller']['rootfolder']}extensions.txt")."<br />";
 
 bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language

@@ -40,7 +40,7 @@ if (is_file("{$config['onebuttoninstaller']['rootfolder']}log/oneload")) { requi
 $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}log/version.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/version.txt", true);
 if ($return_val == 0) { 
     $server_version = exec("cat {$config['onebuttoninstaller']['rootfolder']}log/version.txt"); 
-    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg = sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Update Extension")); }
+    if ($server_version != $config['onebuttoninstaller']['version']) { $savemsg .= sprintf(gettext("New extension version %s available, push '%s' button to install the new version!"), $server_version, gettext("Update Extension")); }
     mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}release_notes.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/release_notes.txt", false);
 }
 else { $server_version = gettext("Unable to retrieve version from server!"); }
@@ -48,20 +48,19 @@ else { $server_version = gettext("Unable to retrieve version from server!"); }
 if (isset($_POST['ext_remove']) && $_POST['ext_remove']) {
 // remove start/stop commands
     if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['postinit']['cmd']);) {
+		for ($i = 0; $i < count($config['rc']['postinit']['cmd']); $i++) {
     		if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) { unset($config['rc']['postinit']['cmd'][$i]);} else{}
-		++$i;
 		}
 	}
 	if ( is_array($config['rc']['shutdown'] ) && is_array( $config['rc']['shutdown']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); ) {
+		for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); $i++) {
             if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) { unset($config['rc']['shutdown']['cmd'][$i]); } else {}
-		++$i;
 		}
 	}
 // remove extension pages
-	mwexec ("rm -rf /usr/local/www/ext/onebuttoninstaller");
-	mwexec ("rm -rf /usr/local/www/onebuttoninstaller*");
+	mwexec("rm -rf /usr/local/www/ext/onebuttoninstaller");
+	mwexec("rmdir -p /usr/local/www/ext");    // to prevent empty extensions menu entry in top GUI menu if there are no other extensions installed
+	mwexec("rm -rf /usr/local/www/onebuttoninstaller*");
 // unlink created links
     if (is_link("/usr/local/share/locale-obi")) unlink("/usr/local/share/locale-obi");
 // remove application section from config.xml
