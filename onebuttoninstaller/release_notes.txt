@@ -1,4 +1,8 @@
 ﻿Version Date        Description
+0.3.2   2016.08.25  N: configuration - add checkbox to enable the installation of extensions even if they are already installed
+                    N: Swedish translation
+                    C: update Greek translation
+                    C: update German translation
 0.3.1   2016.08.15  F: OBI installer - add checkbox to override restriction for extensions installation path 
 0.3     2016.08.14  N: configuration - checkbox to override restriction for extensions installation path 
                        (limited to a directory under /mnt/)

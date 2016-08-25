@@ -135,34 +135,33 @@ function log_display($loginfo) {
             if (!isset($config['onebuttoninstaller']['show_beta'])  && (strpos($result[1], "RELEASE") === false)) continue;     //check for beta state
             else {
                 if ($i == count($loginfo['columns']) - 1) {
-                
-                
-                    // check if extension is already installed (existing config.xml or postinit cmd entry)
-                    if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
-                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";
-                    }
-                    else {                                                  // not installed
-                        $supported_app = true;
-                        if (!empty($result[6])) {                           // something unsupported exist
-                            $unsupported = explode(",", str_replace(" ", "", $result[6]));
-                            for ($k = 0; $k < count($unsupported); $k++) {  // check for unsupported release / architecture / platforms
-                                if (!check_min_release($unsupported[$k]) || ($unsupported[$k] == $g['arch']) || ($unsupported[$k] == $g['platform'])) {
-                                    echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform/release').': '.$unsupported[$k]."' /></td>\n";
-                                    $supported_app = false;
-                                    break;
-                                }
+                    if (!empty($result[6])) {                           // something unsupported exist
+                        $unsupported = explode(",", str_replace(" ", "", $result[6]));
+                        for ($k = 0; $k < count($unsupported); $k++) {  // check for unsupported release / architecture / platforms
+                            if (!check_min_release($unsupported[$k]) || ($unsupported[$k] == $g['arch']) || ($unsupported[$k] == $g['platform'])) {
+                                echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_disabled.png' border='0' alt='' title='".gettext('Unsupported architecture/platform/release').': '.$unsupported[$k]."' /></td>\n";
+                                break;
                             }
-                        } 
-                        if ($supported_app === true) {
-                        // data for installation
-                            echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' >
-                                <input type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
-                                <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
-                                <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
-                                <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />
-                            </td>\n";
-                        }                
-                    }   // EOnot-installed
+                        }
+                    }
+                    // check if extension is already installed (existing config.xml or postinit cmd entry)
+                    $already_installed = false;
+echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' "; 
+                    if ((isset($config[$result[2]])) || (log_get_status($result[2]) == 1)) {
+//                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'> <img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /></td>\n";
+                        echo "><img src='{$image_path}status_enabled.png' border='0' alt='' title='".gettext('Enabled')."' /";
+                        $already_installed = true;
+                    }
+                    if (($already_installed === false) || isset($config['onebuttoninstaller']['re_install']) ) {
+                    // data for installation
+//                        echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}' title='".gettext('Select to install')."' >
+                        echo "><input title='".gettext('Select to install')."' type='checkbox' name='name[".$j."][extension]' value='".$result[2]."' />
+                            <input type='hidden' name='name[".$j."][truename]' value='".$result[0]."' />
+                            <input type='hidden' name='name[".$j."][command1]' value='".$result[3]."' />
+                            <input type='hidden' name='name[".$j."][command2]' value='".$result[4]."' />";
+//                        </td>\n";
+                    }
+echo "</td>\n";
                 }   // EOcount
                 else echo "<td {$loginfo['columns'][$i]['param']} class='{$loginfo['columns'][$i]['class']}'>" . $result[$loginfo['columns'][$i]['pmid']] . "</td>\n";
             }   //EObeta-check
@@ -215,6 +214,7 @@ if ($return_val == 0) {
 }   //EOversion-check
 
 if (!is_file("{$config['onebuttoninstaller']['rootfolder']}extensions.txt")) $errormsg .= sprintf(gettext("File %s not found!"), "{$config['onebuttoninstaller']['rootfolder']}extensions.txt")."<br />";
+if (isset($config['onebuttoninstaller']['re_install'])) $savemsg .= sprintf(gettext("Option '%s' in '%s' is enabled!"), gettext("Re-install"), gettext("Configuration"));
 
 bindtextdomain("nas4free", "/usr/local/share/locale");                  // to get the right main menu language
 include("fbegin.inc");
