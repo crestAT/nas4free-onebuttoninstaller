@@ -47,14 +47,22 @@ else { $server_version = gettext("Unable to retrieve version from server!"); }
 
 if (isset($_POST['ext_remove']) && $_POST['ext_remove']) {
 // remove start/stop commands
-    if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['postinit']['cmd']); $i++) {
-    		if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) { unset($config['rc']['postinit']['cmd'][$i]);} else{}
-		}
+// remove existing old rc format entries
+	if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
+	    for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) {
+	        if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
+	    }
 	}
-	if ( is_array($config['rc']['shutdown'] ) && is_array( $config['rc']['shutdown']['cmd'] ) ) {
-		for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); $i++) {
-            if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) { unset($config['rc']['shutdown']['cmd'][$i]); } else {}
+	if (is_array($config['rc']) && is_array($config['rc']['shutdown']) && is_array( $config['rc']['shutdown']['cmd'])) {
+	    for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); ++$i) {
+	        if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) unset($config['rc']['shutdown']['cmd'][$i]);
+	    }
+	}
+// remove existing entries for new rc format
+	$sphere_array = &$config['rc']['param'];
+	if (is_array($config['rc']) && is_array($config['rc']['param'])) {
+	    for ($i = 0; $i < count($config['rc']['param']); ++$i) {
+			if (false !== ($index = array_search_ex("/onebuttoninstaller/", $sphere_array, 'value'))) unset($sphere_array[$index]);
 		}
 	}
 // remove extension pages

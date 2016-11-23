@@ -29,7 +29,7 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
-$v = "v0.3.3";      // extension version
+$v = "v0.3.4-beta1";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
@@ -75,46 +75,62 @@ else {
 }
 
 // install / update application on NAS4Free
-if ( !isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstaller'])) { 
-// new installation
-    $config['onebuttoninstaller'] = array();      
-    $config['onebuttoninstaller']['appname'] = $appname;
-    $config['onebuttoninstaller']['version'] = exec("cat {$install_dir}version.txt");
-    $config['onebuttoninstaller']['rootfolder'] = $install_dir;
-    $i = 0;
-    if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-        for ($i; $i < count($config['rc']['postinit']['cmd']);) {
-            if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) break; ++$i; }
+if (!isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstaller'])) $config['onebuttoninstaller'] = array(); 
+$config['onebuttoninstaller']['appname'] = $appname;
+$config['onebuttoninstaller']['version'] = exec("cat {$install_dir}version.txt");
+$config['onebuttoninstaller']['rootfolder'] = $install_dir;
+
+// remove start/stop commands
+// remove existing old rc format entries
+if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
+    for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) {
+        if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
     }
-    $config['rc']['postinit']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_start.php";
-    $i =0;
-    if ( is_array($config['rc']['shutdown'] ) && is_array( $config['rc']['shutdown']['cmd'] ) ) {
-        for ($i; $i < count($config['rc']['shutdown']['cmd']); ) {
-            if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) break; ++$i; }
+}
+if (is_array($config['rc']) && is_array($config['rc']['shutdown']) && is_array( $config['rc']['shutdown']['cmd'])) {
+    for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); ++$i) {
+        if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) unset($config['rc']['shutdown']['cmd'][$i]);
     }
-    $config['rc']['shutdown']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_stop.php";
-    write_config();
-    require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
+}
+// remove existing entries for new rc format
+$sphere_array = &$config['rc']['param'];
+if (is_array($config['rc']) && is_array($config['rc']['param'])) {
+    for ($i = 0; $i < count($config['rc']['param']); ++$i) {
+		if (false !== ($index = array_search_ex("/onebuttoninstaller/", $sphere_array, 'value'))) unset($sphere_array[$index]);
+	}
+}
+
+if ($release[0] >= 11.0) {	// new rc format
+	// postinit command
+	$rc_param = [];
+	$rc_param['uuid'] = uuid();
+	$rc_param['name'] = "{$appname} Extension";
+	$rc_param['value'] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php";
+	$rc_param['comment'] = "Start {$appname} Extension";
+	$rc_param['typeid'] = '2';
+	$rc_param['enable'] = true;
+	$config['rc']['param'][] = $rc_param;
+	$config['onebuttoninstaller']['rc_uuid_start'] = $rc_param['uuid'];
+
+	unset($rc_param);
+	/* shutdown command */
+	$rc_param = [];
+	$rc_param['uuid'] = uuid();
+	$rc_param['name'] = "{$appname} Extension";
+	$rc_param['value'] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-stop.php";
+	$rc_param['comment'] = "Stop {$appname} Extension";
+	$rc_param['typeid'] = '3';
+	$rc_param['enable'] = true;
+	$config['rc']['param'][] = $rc_param;
+	$config['onebuttoninstaller']['rc_uuid_stop'] = $rc_param['uuid'];
 }
 else {
-// update release
-    $config['onebuttoninstaller']['version'] = exec("cat {$install_dir}version.txt");
-    $config['onebuttoninstaller']['rootfolder'] = $install_dir;
-    $i = 0;
-    if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-        for ($i; $i < count($config['rc']['postinit']['cmd']);) {
-            if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) break; ++$i; }
-    }
-    $config['rc']['postinit']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_start.php";
-    $i =0;
-    if ( is_array($config['rc']['shutdown'] ) && is_array( $config['rc']['shutdown']['cmd'] ) ) {
-        for ($i; $i < count($config['rc']['shutdown']['cmd']); ) {
-            if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) break; ++$i; }
-    }
-    $config['rc']['shutdown']['cmd'][$i] = $config['onebuttoninstaller']['rootfolder']."onebuttoninstaller_stop.php";
-    write_config();
-    require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
+	$config['rc']['postinit']['cmd'][] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php";
+	$config['rc']['shutdown']['cmd'][] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php";
 }
+
+write_config();
+require_once("{$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php");
 // finally fetch the most recent extensions list to get the latest changes if not already in the master release
 $return_val = mwexec("fetch -o {$config['onebuttoninstaller']['rootfolder']}extensions.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/extensions.txt", true);
 ?>

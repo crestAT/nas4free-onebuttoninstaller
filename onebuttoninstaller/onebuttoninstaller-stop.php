@@ -32,5 +32,6 @@
 $extension_dir = "/usr/local/www";
 mwexec("rm -Rf {$extension_dir}/onebuttoninstaller*", true);
 mwexec("rm -Rf {$extension_dir}/ext/onebuttoninstaller", true);
+if (is_link("/usr/local/share/locale-obi")) unlink("/usr/local/share/locale-obi");
 exec("logger onebuttoninstaller: stopped"); 
 ?>
