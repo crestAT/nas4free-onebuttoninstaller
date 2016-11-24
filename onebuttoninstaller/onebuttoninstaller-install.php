@@ -93,10 +93,10 @@ if (is_array($config['rc']) && is_array($config['rc']['shutdown']) && is_array( 
     }
 }
 // remove existing entries for new rc format
-$sphere_array = &$config['rc']['param'];
 if (is_array($config['rc']) && is_array($config['rc']['param'])) {
-    for ($i = 0; $i < count($config['rc']['param']); ++$i) {
-		if (false !== ($index = array_search_ex("/onebuttoninstaller/", $sphere_array, 'value'))) unset($sphere_array[$index]);
+	$rc_param_count = count($config['rc']['param']);
+    for ($i = 0; $i < $rc_param_count; $i++) {
+        if (preg_match('/onebuttoninstaller/', $config['rc']['param'][$i]['value'])) unset($config['rc']['param'][$i]);
 	}
 }
 
