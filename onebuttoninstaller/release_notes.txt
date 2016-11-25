@@ -1,4 +1,13 @@
 ﻿Version Date        Description
+0.3.4   2016.11.23  N: command scripts rc format for NAS4Free 11.x compatibility
+                    N: MidnightCommander: command scripts rc format for NAS4Free 11.x compatibility
+                    N: Chinese (Simplified) translation
+                    C: update Dutch translation
+                    C: update Italian translation
+                    C: update Romanian translation
+                    C: update Spanish translation
+                    C: update Ukrainian translation
+                    C: MidnightCommander: symlinks for NAS4Free 11.x compatibility
 0.3.3   2016.09.01  N: Turkish translation
                     N: Ukrainian translation
                     C: update Dutch translation

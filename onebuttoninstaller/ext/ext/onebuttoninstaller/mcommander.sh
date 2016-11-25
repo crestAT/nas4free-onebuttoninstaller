@@ -11,6 +11,8 @@
 # date:         2014-12-18 ; Update for v9.3; Clean up
 # date:         2015-02-21 ; Update mc package to mc-4.8.11.tbz
 # date:         2016-08-04 ; check hardware platform to use it on i386 too - author: crest <info@a3s.at>
+# date:         2016-11-21 ; create symlinks for v11.x compatibility - author: crest <info@a3s.at>
+#
 # purpose:      Install Midnight Commander on NAS4Free (embedded version).
 # Note:         Check the end of the page.
 #
@@ -82,6 +84,9 @@ cd /usr/local/lib
 [ -e libpcre.so.3 ] || ln -s /usr/local/lib/libpcre.so.1 libpcre.so.3
 [ -e libintl.so.9 ] || ln -s /usr/local/lib/libintl.so.8 libintl.so.9
 [ -e libiconv.so.3 ] || ln -s /usr/local/lib/libiconv.so.2 libiconv.so.3
+# Symlinks for v11.x
+if [ -e /usr/lib/libssl.so.8 ]; then ln -sf /usr/lib/libssl.so.8 libssl.so.6; fi
+if [ -e /lib/libcrypto.so.8 ]; then ln -sf /lib/libcrypto.so.8 libcrypto.so.6; fi
 cd -
 
 # Aliases
