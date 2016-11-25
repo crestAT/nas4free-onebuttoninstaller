@@ -30,22 +30,24 @@
     either expressed or implied, of the FreeBSD Project.
  */
 
+require_once("config.inc");
+
 $command = "mcommander.sh";
 $cmd = dirname(__FILE__)."/".$command;
-require_once("config.inc");
-require_once("functions.inc");
 
+// remove start/stop commands
 // remove existing old rc format entries
 if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
-    for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) {
-        if (preg_match("/$command/", $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
+    $rc_param_count = count($config['rc']['postinit']['cmd']);
+    for ($i = 0; $i < $rc_param_count; ++$i) {
+        if (preg_match("/{$command}/", $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
     }
 }
 // remove existing entries for new rc format
-$sphere_array = &$config['rc']['param'];
 if (is_array($config['rc']) && is_array($config['rc']['param'])) {
-    for ($i = 0; $i < count($config['rc']['param']); ++$i) {
-		if (false !== ($index = array_search_ex("/$command/", $sphere_array, 'value'))) unset($sphere_array[$index]);
+	$rc_param_count = count($config['rc']['param']);
+    for ($i = 0; $i < $rc_param_count; $i++) {
+        if (preg_match("/{$command}/", $config['rc']['param'][$i]['value'])) unset($config['rc']['param'][$i]);
 	}
 }
 

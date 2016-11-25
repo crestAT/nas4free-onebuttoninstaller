@@ -34,10 +34,38 @@ $command = "fail2ban_start.sh";
 $cmd = dirname(__FILE__)."/".$command;
 require_once("config.inc");
 require_once("functions.inc");
-		if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-            for ($i = 0; $i < count($config['rc']['postinit']['cmd']); $i++) {
-                if (preg_match("/$command/", $config['rc']['postinit']['cmd'][$i])) break; }
-        }
-        $config['rc']['postinit']['cmd'][$i] = $config['cmd']."$cmd";
-		write_config();
+
+// remove start/stop commands
+// remove existing old rc format entries
+if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
+    for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) {
+        if (preg_match('/$command/', $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
+    }
+}
+// remove existing entries for new rc format
+if (is_array($config['rc']) && is_array($config['rc']['param'])) {
+	$rc_param_count = count($config['rc']['param']);
+    for ($i = 0; $i < $rc_param_count; $i++) {
+        if (preg_match('/$command/', $config['rc']['param'][$i]['value'])) unset($config['rc']['param'][$i]);
+	}
+}
+
+// check FreeBSD release
+$release = explode("-", exec("uname -r"));
+
+if ($release[0] >= 11.0) {	// new rc format
+	// postinit command
+	$rc_param = [];
+	$rc_param['uuid'] = uuid();
+	$rc_param['name'] = "Fail2Ban Extension";
+	$rc_param['value'] = "{$cmd}";
+	$rc_param['comment'] = "Start Fail2Ban";
+	$rc_param['typeid'] = '2';
+	$rc_param['enable'] = true;
+	$config['rc']['param'][] = $rc_param;
+}
+else {
+	$config['rc']['postinit']['cmd'][] = "{$cmd}";
+}
+write_config();
 ?>

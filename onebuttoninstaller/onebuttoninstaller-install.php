@@ -83,12 +83,14 @@ $config['onebuttoninstaller']['rootfolder'] = $install_dir;
 // remove start/stop commands
 // remove existing old rc format entries
 if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
-    for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) {
+    $rc_param_count = count($config['rc']['postinit']['cmd']);
+    for ($i = 0; $i < $rc_param_count; ++$i) {
         if (preg_match('/onebuttoninstaller/', $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
     }
 }
 if (is_array($config['rc']) && is_array($config['rc']['shutdown']) && is_array( $config['rc']['shutdown']['cmd'])) {
-    for ($i = 0; $i < count($config['rc']['shutdown']['cmd']); ++$i) {
+    $rc_param_count = count($config['rc']['shutdown']['cmd']);
+    for ($i = 0; $i < $rc_param_count; ++$i) {
         if (preg_match('/onebuttoninstaller/', $config['rc']['shutdown']['cmd'][$i])) unset($config['rc']['shutdown']['cmd'][$i]);
     }
 }

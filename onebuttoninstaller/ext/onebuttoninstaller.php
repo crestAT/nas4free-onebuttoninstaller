@@ -85,19 +85,22 @@ function log_get_status($cmd_entry) {
     $rc_cmd_entry_found = false;
 
 	if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {	// old rc format
-        for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) { 
-			if (preg_match("/$cmd_entry/", $config['rc']['postinit']['cmd'][$i])) 
-			$rc_cmd_entry_found = true;
-			break;
+		$rc_param_count = count($config['rc']['postinit']['cmd']);
+        for ($i = 0; $i < $rc_param_count; $i++) { 
+			if (preg_match("/{$cmd_entry}/", $config['rc']['postinit']['cmd'][$i])) {
+				$rc_cmd_entry_found = true;				
+				break;
+			}
 		}
     }
 
 	if (is_array($config['rc']) && is_array($config['rc']['param'])) {	// new rc format 11.x
 		$rc_param_count = count($config['rc']['param']);
 	    for ($i = 0; $i < $rc_param_count; $i++) { 
-			if (preg_match('/$cmd_entry/', $config['rc']['param'][$i]['value'])) 
-			$rc_cmd_entry_found = true;
-			break;
+			if (preg_match("/{$cmd_entry}/", $config['rc']['param'][$i]['value'])) {
+				$rc_cmd_entry_found = true;
+				break;
+			} 
 		}
 	}
 
