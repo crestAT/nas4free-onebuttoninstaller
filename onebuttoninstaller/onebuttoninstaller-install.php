@@ -2,7 +2,7 @@
 /* 
     onebuttoninstaller-install.php
     
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2017 Andreas Schmidhuber
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -126,7 +126,7 @@ if ($release[0] >= 11.0) {	// new rc format
 }
 else {
 	$config['rc']['postinit']['cmd'][] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php";
-	$config['rc']['shutdown']['cmd'][] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-start.php";
+	$config['rc']['shutdown']['cmd'][] = "/usr/local/bin/php-cgi -f {$config['onebuttoninstaller']['rootfolder']}onebuttoninstaller-stop.php";
 }
 
 write_config();

@@ -2,7 +2,7 @@
 /*
     onebuttoninstaller-start.php 
 
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2017 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
+require_once("config.inc");
+
 $extension_dir = "/usr/local/www"; 
 
 mwexec("ln -sf {$config['onebuttoninstaller']['rootfolder']}locale-obi /usr/local/share/", true);           // create link to languages

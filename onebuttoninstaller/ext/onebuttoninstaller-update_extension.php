@@ -2,7 +2,7 @@
 /*
     onebuttoninstaller-update_extension.php
     
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2017 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

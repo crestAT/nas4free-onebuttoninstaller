@@ -2,7 +2,7 @@
 /*
 	onebuttoninstaller.php
 	
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2017 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -82,13 +82,27 @@ function log_get_contents($logfile) {
 
 function log_get_status($cmd_entry) {
     global $config;
-    $i =0;
-    if ( is_array($config['rc']['postinit'] ) && is_array( $config['rc']['postinit']['cmd'] ) ) {
-        for ($i; $i < count($config['rc']['postinit']['cmd']);) { if (preg_match("/$cmd_entry/", $config['rc']['postinit']['cmd'][$i])) break; ++$i; }
+    $rc_cmd_entry_found = false;
+
+	if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {	// old rc format
+        for ($i = 0; $i < count($config['rc']['postinit']['cmd']); ++$i) { 
+			if (preg_match("/$cmd_entry/", $config['rc']['postinit']['cmd'][$i])) 
+			$rc_cmd_entry_found = true;
+			break;
+		}
     }
-//echo($cmd_entry." $i   - ");
-    if ($i == count($config['rc']['postinit']['cmd'])) return 0;        // 0 = no entry, extension is not installed
-    else return 1;                                                      // 1 = entry found, extension is already installed                                                      
+
+	if (is_array($config['rc']) && is_array($config['rc']['param'])) {	// new rc format 11.x
+		$rc_param_count = count($config['rc']['param']);
+	    for ($i = 0; $i < $rc_param_count; $i++) { 
+			if (preg_match('/$cmd_entry/', $config['rc']['param'][$i]['value'])) 
+			$rc_cmd_entry_found = true;
+			break;
+		}
+	}
+
+	if ($rc_cmd_entry_found) return 1;									// 0 = no entry, extension is not installed
+    else return 0;                                                      // 1 = entry found, extension is already installed                                                      
 }
 
 function log_display($loginfo) {

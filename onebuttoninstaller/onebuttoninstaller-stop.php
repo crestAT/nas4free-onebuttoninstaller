@@ -2,7 +2,7 @@
 /*
     onebuttoninstaller-stop.php
 
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2017 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,10 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
+require_once("config.inc");
+
 $extension_dir = "/usr/local/www";
+
 mwexec("rm -Rf {$extension_dir}/onebuttoninstaller*", true);
 mwexec("rm -Rf {$extension_dir}/ext/onebuttoninstaller", true);
 if (is_link("/usr/local/share/locale-obi")) unlink("/usr/local/share/locale-obi");
