@@ -29,7 +29,7 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
-$v = "v0.3.4-beta1";      // extension version
+$v = "v0.3.4";      // extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
