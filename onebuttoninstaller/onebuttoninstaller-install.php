@@ -29,7 +29,7 @@
     of the authors and should not be interpreted as representing official policies,
     either expressed or implied, of the FreeBSD Project.
 */
-$v = "v0.3.4";      // extension version
+$v = "v0.3.4.1";		// extension version
 $appname = "OneButtonInstaller";
 
 require_once("config.inc");
@@ -111,6 +111,8 @@ if ($release[0] >= 11.0) {	// new rc format
 	$rc_param['comment'] = "Start {$appname} Extension";
 	$rc_param['typeid'] = '2';
 	$rc_param['enable'] = true;
+	if (!is_array($config['rc'])) $config['rc'] = [];
+	if (!is_array($config['rc']['param'])) $config['rc']['param'] = [];
 	$config['rc']['param'][] = $rc_param;
 	$config['onebuttoninstaller']['rc_uuid_start'] = $rc_param['uuid'];
 
@@ -123,6 +125,8 @@ if ($release[0] >= 11.0) {	// new rc format
 	$rc_param['comment'] = "Stop {$appname} Extension";
 	$rc_param['typeid'] = '3';
 	$rc_param['enable'] = true;
+	if (!is_array($config['rc'])) $config['rc'] = [];
+	if (!is_array($config['rc']['param'])) $config['rc']['param'] = [];
 	$config['rc']['param'][] = $rc_param;
 	$config['onebuttoninstaller']['rc_uuid_stop'] = $rc_param['uuid'];
 }
