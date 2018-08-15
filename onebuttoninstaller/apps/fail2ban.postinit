@@ -1,6 +1,6 @@
 <?php
 /*
-    onebuttoninstaller-stop.php
+    fail2ban.postinit
 
     Copyright (c) 2015 - 2018 Andreas Schmidhuber
     All rights reserved.
@@ -24,17 +24,44 @@
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
+
+$command = "fail2ban_start.sh";
+$cmd = dirname(__FILE__)."/".$command;
 require_once("config.inc");
 
-$configName = "onebuttoninstaller";
+// remove start/stop commands
+// remove existing old rc format entries
+if (is_array($config['rc']) && is_array($config['rc']['postinit']) && is_array( $config['rc']['postinit']['cmd'])) {
+    $rc_param_count = count($config['rc']['postinit']['cmd']);
+    for ($i = 0; $i < $rc_param_count; $i++) {
+        if (preg_match("/{$command}/", $config['rc']['postinit']['cmd'][$i])) unset($config['rc']['postinit']['cmd'][$i]);
+    }
+}
+// remove existing entries for new rc format
+if (is_array($config['rc']) && is_array($config['rc']['param']['0'])) {
+	$rc_param_count = count($config['rc']['param']);
+    for ($i = 0; $i < $rc_param_count; $i++) {
+        if (preg_match("/{$command}/", $config['rc']['param'][$i]['value'])) unset($config['rc']['param'][$i]);
+	}
+}
 
-if (is_link("/usr/local/share/locale-{$configName}")) unlink("/usr/local/share/locale-{$configName}");
-if (is_link("/usr/local/www/{$configName}.php")) unlink("/usr/local/www/{$configName}.php");
-if (is_link("/usr/local/www/{$configName}-config.php")) unlink("/usr/local/www/{$configName}-config.php");
-if (is_link("/usr/local/www/{$configName}-update_extension.php")) unlink("/usr/local/www/{$configName}-update_extension.php");
-if (is_link("/usr/local/www/ext/{$configName}")) unlink("/usr/local/www/ext/{$configName}");
-mwexec("rmdir -p /usr/local/www/ext");
+// check FreeBSD release
+$release = explode("-", exec("uname -r"));
 
-exec("logger onebuttoninstaller-extension: stopped"); 
+if ($release[0] >= 11.0) {	// new rc format
+	// postinit command
+	$rc_param = [];
+	$rc_param['uuid'] = uuid();
+	$rc_param['name'] = "Fail2Ban Extension";
+	$rc_param['value'] = "{$cmd}";
+	$rc_param['comment'] = "Start Fail2Ban";
+	$rc_param['typeid'] = '2';
+	$rc_param['enable'] = true;
+	$config['rc']['param'][] = $rc_param;
+}
+else {
+	$config['rc']['postinit']['cmd'][] = "{$cmd}";
+}
+write_config();
 ?>

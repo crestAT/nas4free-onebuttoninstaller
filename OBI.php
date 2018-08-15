@@ -2,7 +2,7 @@
 /* 
     OBI.php
 
-    Copyright (c) 2015 - 2016 Andreas Schmidhuber
+    Copyright (c) 2015 - 2018 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -24,10 +24,6 @@
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-    The views and conclusions contained in the software and documentation are those
-    of the authors and should not be interpreted as representing official policies,
-    either expressed or implied, of the FreeBSD Project.
  */
 require("auth.inc");
 require("guiconfig.inc");
@@ -36,6 +32,10 @@ $application = "OneButtonInstaller";
 $pgtitle = array(gettext("Extensions"), gettext($application), gettext("Configuration"));
 
 if (!isset($config['onebuttoninstaller']) || !is_array($config['onebuttoninstaller'])) $config['onebuttoninstaller'] = array();
+
+$platform = $g['platform'];
+if ($platform == "livecd" || $platform == "liveusb") 
+	$input_errors[] = sprintf(gettext("Attention: the used XigmaNAS platform '%s' is not recommended for extensions! After a reboot all extensions will no longer be available, use XigmaNAS embedded or full platform instead!"), $platform);
 
 /* Check if the directory exists, the mountpoint has at least o=rx permissions and
  * set the permission to 775 for the last directory in the path
@@ -85,7 +85,7 @@ if (isset($_POST['save']) && $_POST['save']) {
             $config['onebuttoninstaller']['path_check'] = isset($_POST['path_check']) ? true : false;
             $install_dir = $config['onebuttoninstaller']['storage_path']."/";   // get directory where the installer script resides
             if (!is_dir("{$install_dir}onebuttoninstaller/log")) { mkdir("{$install_dir}onebuttoninstaller/log", 0775, true); }
-            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", true);
+            $return_val = mwexec("fetch {$verify_hostname} -vo {$install_dir}onebuttoninstaller/onebuttoninstaller-install.php 'https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/onebuttoninstaller-install.php'", false);
             if ($return_val == 0) {
                 chmod("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php", 0775);
                 require_once("{$install_dir}onebuttoninstaller/onebuttoninstaller-install.php");

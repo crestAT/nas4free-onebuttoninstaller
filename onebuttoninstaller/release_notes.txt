@@ -1,4 +1,13 @@
 ﻿Version Date        Description
+0.4     2018.08.15  N: Ncurses Disk Usage (ncdu) shell app
+                    N: use dedicated config file
+                    N: check and warn if on LiveUSB/LiveCD
+                    N: check for working internet connection
+                    N: cleanup button on install page - usable in conjunction with the option 'Re-install' to only perform a cleanup
+                        without new installation of extensions
+                    C: improvements for option 'Re-install', cleanup of config and command scripts prior to the installation process
+                    F: GUI translations not working due to name change to XigmaNAS
+
 0.3.4.1 2017.02.17  F: installation fails on vanilla systems => http://forums.nas4free.org/viewtopic.php?f=71&t=11189&p=75515#p75357
 
 0.3.4   2016.11.23  N: command scripts rc format for NAS4Free 11.x compatibility
