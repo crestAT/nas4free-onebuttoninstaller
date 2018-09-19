@@ -246,6 +246,7 @@ if (isset($_POST['install'], $_POST['name'])) {
     }   // EOforeach
 }   // EOinstall
 
+$configuration = ext_load_config("ext/onebuttoninstaller/onebuttoninstaller.conf");	// to prevent collisions with installed extension definitions
 // extensions list file handling for => manual update | auto update | missing file | file older than 24 hours
 if (isset($_POST['update']) || ($configuration['auto_update'] && !isset($_POST['install'])) || !is_file("{$configuration['rootfolder']}/extensions.txt") || filemtime("{$configuration['rootfolder']}/extensions.txt") < time() - 86400) {
     $return_val = mwexec("fetch -o {$configuration['rootfolder']}/extensions.txt https://raw.github.com/crestAT/nas4free-onebuttoninstaller/master/onebuttoninstaller/extensions.txt", false);

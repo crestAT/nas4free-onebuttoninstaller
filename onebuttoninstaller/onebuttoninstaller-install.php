@@ -25,7 +25,7 @@
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-$v = "v0.4";															// extension version
+$v = "v0.4.0.1";															// extension version
 $appName = "OneButtonInstaller";
 $configName = "onebuttoninstaller";
 
