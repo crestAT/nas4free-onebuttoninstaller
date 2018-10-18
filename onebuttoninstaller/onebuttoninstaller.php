@@ -44,6 +44,7 @@ if (($configuration = ext_load_config($configFile)) === false) $input_errors[] =
 if (!isset($configuration['rootfolder']) && !is_dir($configuration['rootfolder'] )) $input_errors[] = gettext("Extension installed with fault");
 
 if (!$configuration['enable']) header("Location:onebuttoninstaller-config.php");
+$configurationStoragePath = $configuration['storage_path'];				// to prevent collisions with installed extension definitions 
 
 $platform = $g['platform'];
 if ($platform == "livecd" || $platform == "liveusb")
@@ -221,21 +222,21 @@ if (isset($_POST['install'], $_POST['name'])) {
 			write_config();
             $savemsg .= gettext("Installation").": <b>{$line['truename']}</b>"."<br />";
             unset($result);
-            exec("cd {$configuration['storage_path']} && {$line['command1']}", $result, $return_val);
+            exec("cd {$configurationStoragePath} && {$line['command1']}", $result, $return_val);
             if ($return_val == 0) {
             	foreach ($result as $msg) $savemsg .= $msg."<br />";    // output on success
                 unset($result);
                 if ("{$line['command2']}" != "-") {                     // check if a PHP script must be executed
-                    if (file_exists("{$configuration['storage_path']}/{$line['command2']}")) {
+                    if (file_exists("{$configurationStoragePath}/{$line['command2']}")) {
                         $savemsg_old = $savemsg;                        // save messages for use after output buffering ends
                         ob_start();                                     // start output buffering
-                        include("{$configuration['storage_path']}/{$line['command2']}");
+                        include("{$configurationStoragePath}/{$line['command2']}");
                         $ausgabe = ob_get_contents();                   // get outputs from include command
                         ob_end_clean();                                 // close output buffering 
                         $savemsg = $savemsg_old;                        // recover saved messages ...
                         $savemsg .= str_replace("\n", "<br />", $ausgabe)."<br />";     // ... and append messages from include command
                     }
-                    else $errormsg .= sprintf(gettext("PHP script %s not found!"), "{$configuration['storage_path']}/{$line['command2']}")."<br />";
+                    else $errormsg .= sprintf(gettext("PHP script %s not found!"), "{$configurationStoragePath}/{$line['command2']}")."<br />";
                 }
             }   // EOcommand1 OK
             else {                                                     // throw error message for command1

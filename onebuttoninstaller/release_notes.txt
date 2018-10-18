@@ -1,4 +1,8 @@
 ﻿Version Date        Description
+0.4.0.2 2018.10.18  F: installation errors on multiple installations in some cases
+                    C: update Russian translation
+                    C: update Ukrainian translation
+
 0.4.0.1 2018.09.19  F: false 'new version' messages after installation of extensions
                     C: update German translation
                     C: update Greek translation
