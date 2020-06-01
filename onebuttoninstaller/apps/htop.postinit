@@ -28,8 +28,8 @@
 
 require_once("config.inc");
 
-$appName = "Midnight Commander";
-$command = "mc-start.php";
+$appName = "Htop";
+$command = "htop-start.php";
 $cmd = dirname(__FILE__)."/{$command}";
 
 // remove start/stop commands

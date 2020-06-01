@@ -2,7 +2,7 @@
 /* 
     onebuttoninstaller-install.php
     
-    Copyright (c) 2015 - 2018 Andreas Schmidhuber
+    Copyright (c) 2015 - 2020 Andreas Schmidhuber
     All rights reserved.
     
     Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-$v = "v0.4.0.2";															// extension version
+$v = "v0.4.1";															// extension version
 $appName = "OneButtonInstaller";
 $configName = "onebuttoninstaller";
 

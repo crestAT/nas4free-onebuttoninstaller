@@ -2,7 +2,7 @@
 /* 
     OBI.php
 
-    Copyright (c) 2015 - 2018 Andreas Schmidhuber
+    Copyright (c) 2015 - 2020 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

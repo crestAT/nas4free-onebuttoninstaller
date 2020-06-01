@@ -2,7 +2,7 @@
 /*
     universal postinit file for CLI extensions
 
-    Copyright (c) 2015 - 2018 Andreas Schmidhuber
+    Copyright (c) 2015 - 2020 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 require_once("config.inc");
 
 $appName = "NCurses Disk Usage";
-$command = "ncdu.sh";
-$cmd = dirname(__FILE__)."/".$command;
+$command = "ncdu-start.php";
+$cmd = dirname(__FILE__)."/{$command}";
 
 // remove start/stop commands
 // remove existing old rc format entries
@@ -56,14 +56,15 @@ if ($release[0] >= 11.0) {	// new rc format
 	$rc_param = [];
 	$rc_param['uuid'] = uuid();
 	$rc_param['name'] = "{$appName} Extension";
-	$rc_param['value'] = "{$cmd}";
+	$rc_param['value'] = "php {$cmd}";
 	$rc_param['comment'] = "Start {$appName}";
 	$rc_param['typeid'] = '2';
 	$rc_param['enable'] = true;
 	$config['rc']['param'][] = $rc_param;
 }
 else {
-	$config['rc']['postinit']['cmd'][] = "{$cmd}";
+	$config['rc']['postinit']['cmd'][] = "php {$cmd}";
 }
 write_config();
+require_once($cmd);
 ?>

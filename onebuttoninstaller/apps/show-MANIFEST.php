@@ -1,8 +1,8 @@
 <?php
 /*
-    onebuttoninstaller-stop.php
+    show-MANIFEST.php 
 
-    Copyright (c) 2015 - 2020 Andreas Schmidhuber
+    Copyright (c) 2018 - 2019 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,20 @@
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-require_once("config.inc");
 
-$configName = "onebuttoninstaller";
+if (!function_exists('ext_load_config'))   {
+    function ext_load_config($config_file, $assoc = true, $depth = 512, $options = 0) {
+        if (is_file($config_file)) {
+            if (($config_data = file_get_contents($config_file)) === false) return false;
+            $config_data = json_decode($config_data, $assoc, $depth, $options);
+            return $config_data;
+        }
+        else return false;
+    }
+}
 
-if (is_link("/usr/local/share/locale-{$configName}")) unlink("/usr/local/share/locale-{$configName}");
-if (is_link("/usr/local/www/{$configName}.php")) unlink("/usr/local/www/{$configName}.php");
-if (is_link("/usr/local/www/{$configName}-config.php")) unlink("/usr/local/www/{$configName}-config.php");
-if (is_link("/usr/local/www/{$configName}-update_extension.php")) unlink("/usr/local/www/{$configName}-update_extension.php");
-if (is_link("/usr/local/www/ext/{$configName}")) unlink("/usr/local/www/ext/{$configName}");
-mwexec("rmdir -p /usr/local/www/ext");
-
-exec("logger onebuttoninstaller-extension: stopped"); 
+$fileName = $argv[1];
+echo "Show '{$fileName}':\n";
+if (($manifest = ext_load_config($fileName)) !== false) print_r($manifest);
+else echo "File '{$fileName}' not found!\n"; 
 ?>

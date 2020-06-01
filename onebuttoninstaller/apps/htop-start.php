@@ -1,8 +1,8 @@
 <?php
 /*
-    onebuttoninstaller-stop.php
+    htop-start.php 
 
-    Copyright (c) 2015 - 2020 Andreas Schmidhuber
+    Copyright (c) 2018 - 2020 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,19 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("config.inc");
+require_once("/usr/local/www/ext/onebuttoninstaller/extension-lib.inc");
+$rootfolder = dirname(__FILE__);
 
-$configName = "onebuttoninstaller";
+$return_val = 0;
 
-if (is_link("/usr/local/share/locale-{$configName}")) unlink("/usr/local/share/locale-{$configName}");
-if (is_link("/usr/local/www/{$configName}.php")) unlink("/usr/local/www/{$configName}.php");
-if (is_link("/usr/local/www/{$configName}-config.php")) unlink("/usr/local/www/{$configName}-config.php");
-if (is_link("/usr/local/www/{$configName}-update_extension.php")) unlink("/usr/local/www/{$configName}-update_extension.php");
-if (is_link("/usr/local/www/ext/{$configName}")) unlink("/usr/local/www/ext/{$configName}");
-mwexec("rmdir -p /usr/local/www/ext");
+$pkgName = "htop";
+$pkgFileNameNeeded = $pkgName;
+$manifest = ext_load_package($pkgName, $pkgFileNameNeeded, $rootfolder);
+$return_val += mwexec("mkdir -p /usr/local/share/pixmaps", true);
+$return_val += mwexec("ln -sf '{$rootfolder}/bin/{$pkgName}/usr/local/bin/htop' /usr/local/bin", true);
+$return_val += mwexec("ln -sf '{$rootfolder}/bin/{$pkgName}/usr/local/share/pixmaps/htop.png' /usr/local/share/pixmaps", true);
 
-exec("logger onebuttoninstaller-extension: stopped"); 
+if ($return_val == 0) mwexec("logger {$pkgName}-extension: started successfully");
+else mwexec("logger {$pkgName}-extension: error(s) during startup, failed with return value = {$return_val}");
+echo "RETVAL = {$return_val}\n";
 ?>

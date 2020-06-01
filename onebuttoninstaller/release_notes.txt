@@ -1,4 +1,13 @@
 ﻿Version Date        Description
+0.4.1	2020.06.01  N: Htop CLI extension
+					C: MidnightCommander & NCDU - improved startup with checks/updates for new releases & changed XigmaNAS firmware
+                    C: update Czech translation
+                    C: update Spanish translation
+                    C: update French translation
+                    C: update Ukrainian translation
+                    C: update Chinese translation
+                    C: update Turkish translation
+
 0.4.0.2 2018.10.18  F: installation errors on multiple installations in some cases
                     C: update Russian translation
                     C: update Ukrainian translation

@@ -2,7 +2,7 @@
 /*
 	onebuttoninstaller.php
 	
-    Copyright (c) 2015 - 2018 Andreas Schmidhuber
+    Copyright (c) 2015 - 2020 Andreas Schmidhuber
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -263,12 +263,7 @@ bindtextdomain($domain, $localeOSDirectory);
 include("fbegin.inc");
 bindtextdomain($domain, $localeExtDirectory);
 ?>
-<!-- The Spinner Elements -->
-<?php include("ext/onebuttoninstaller/spinner.inc");?>
-<script src="ext/onebuttoninstaller/spin.min.js"></script>
-<!-- use: onsubmit="spinner()" within the form tag -->
-
-<form action="onebuttoninstaller.php" method="post" name="iform" id="iform" onsubmit="spinner()">
+<form action="<?php echo $configName; ?>.php" method="post" name="iform" id="iform" onsubmit="spinner()">
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     	<tr><td class="tabnavtbl">
     		<ul id="tabnav">
